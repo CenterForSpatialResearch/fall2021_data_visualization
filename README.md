@@ -1,7 +1,7 @@
 # for this class
-This is a version of the d3 book by Scott Murray with minor adjustments for the Data Visualization for Architecture, Urbanism, and the Humanities class. 
+This is a version of the d3 book by Scott Murray with minor adjustments for the Fall 2021 session of Data Visualization for Architecture, Urbanism, and the Humanities. 
 These changes are:
-- This class uses d3.v5, which is included in the zipped files as d3.js. (The book is written for v4, and the sourcecode for v4, which is used in the original book is saved as d3.v4.js for reference.)
+- This class uses d3.v5, which is included in the zipped files as d3.js. (The book was originally written for v3, then updated for v4)
 - In each chapter, there are files with the word "assignment" in the name which are for students to complete after reading each chapter. These have comments in them with instructions and hints.
 
 # d3-book
