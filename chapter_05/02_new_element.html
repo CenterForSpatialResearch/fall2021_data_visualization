@@ -4,10 +4,19 @@
         <meta charset="utf-8">
         <title>D3 Page Template</title>
         <script type="text/javascript" src="../d3.js"></script>
+		<style>
+			p{
+				font-size:24px;
+				color:gold;
+			}
+		</style>
     </head>
     <body>
         <script type="text/javascript">
-            d3.select("body").append("p").text("New paragraph!");
+			for(var i =0; i<100; i++){
+	            d3.select("body").append("p").text(i+" New paragraph!");
+			}			
+						
         </script>
     </body>
 </html>
