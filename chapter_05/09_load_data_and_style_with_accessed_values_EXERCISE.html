@@ -16,7 +16,7 @@
   				.enter()
   				.append("p")
   				.text(function(d) {
-            console.log(d)
+            		console.log(d)
             //take a look at what has been logged above in the developer console- objects with 2 key and value pairs
             //the keys are Food, and Deliciousness
             //the values are the name of the foods and their scores
@@ -37,7 +37,14 @@
             //to form as sentence using this data similar to the previous example:
   					return d.Food + " has the deliciousness of "+ d.Deliciousness
   				})
+				.style("color",function(d){
+					//YOUR ASSIGNMENT STARTS HERE: 
+					//using a similar method as in 08, and accessing the deliciousness of each food set a threshold for deliciousness where everything with the deliciousness of 5 and above is a different color than those below 5.
+				})
+		//HINT: deliciousness variable is accessed already in the .text portion of the code				
+				
       })
+	  
       .catch(function(error){
            // handle error
       })
