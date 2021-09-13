@@ -11,11 +11,11 @@
 	<body>
 		<script type="text/javascript">
             
-            //ASSIGNMENT: choose to do 1 of 2 things:
-            //1. apply a color scale similar to the bar graph in the previous example to the circles based on their radius
-            //2. change the label text from "label here" to the label of that data point from the dataset - apples, etc.
+            //ASSIGNMENT:
+            //1. apply a color scale similar to the bar graph in the file 19 example to the circles based on their radius
+            //2. change the label text from "label here" to the name of the fruit from the dataset - apples, etc.
 
-			//Width and height
+			//Width and height of svg
 			var w = 500;
 			var h = 200;
 			
@@ -48,7 +48,7 @@
 			   		return d.r
 			   })
          .attr("fill",function(d){
-             return "blue"//NOTE: ADD YOUR CODE HERE TO FULFILL ONE OF THE 2 ASSIGNMENT CHOICES
+			 return "blue"//ADD YOUR CODE HERE TO CHANGE THE COLOR
          });
 
 			svg.selectAll("text")
@@ -56,7 +56,7 @@
 			   .enter()
 			   .append("text")
 			   .text(function(d) {
-			   		return "label here"
+				  return "label here"//ADD HERE TO CHANGE THE LABEL
 			   })
 			   .attr("x", function(d) {
 			   		return d.x+d.r;
@@ -66,7 +66,6 @@
 			   })
 			   .attr("font-family", "sans-serif")
 			   .attr("font-size", "11px")
-			   .attr("fill", "red");
 			
 		</script>
 	</body>
