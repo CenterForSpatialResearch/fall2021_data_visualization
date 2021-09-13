@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>assignment</title>
+		<script type="text/javascript" src="../d3.js"></script>
+		<style type="text/css">
+			/* No style rules here yet */		
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+//ASSIGNMENT:
+//using the data file income_dropout.csv in this chapter's folder.
+//draw a scatterplot using the values in the columns for "dropout_rate",and "median_income"
+//make sure the scale and axes for the plot fits well in the page. 
+//I have created x and y scales for you that will work but you can also change to your liking.
+//create 2 more scales to color and resize the circles based on 1 or both of the columns of values.
+
+			//Width and height
+			var w = 800;
+			var h = 800;
+			var padding = 40;
+			
+			//Load in the data
+			d3.csv("income_dropout.csv")
+            .then(function(data) {
+			//console.log(data) //uncomment so you can see the data printed out and familiarize yourself with it.
+				
+				//here are the 2 scales that I have created based on the previous code file in this chapter. There is 1 point of change in each of the scales below and that is "parseFloat()". The reason behind these 2 additions is that sometime data will load in as a string, and we are unable to do calculations such as max and min for the scales if the data values are interpreted as strings.
+				
+			var xScale = d3.scaleLinear()
+				.domain([0,d3.max(data, function(d) {return parseFloat(d["dropout_rate"]); })])
+				.range([padding,w-padding]);
+							   
+			var yScale = d3.scaleLinear()
+				.domain([0, d3.max(data, function(d) { return parseFloat(d["median_income"]); })])
+				.range([h - padding, padding]);
+				
+           //TODO: make a linear scale named cScale for the colors you will use
+           //HINT: the domain is the values from the data, you must use parseFloat() again like above to make sure that the value is not a string, and the range is an array of 2 colors such as ["red","blue"]
+			//TODO: make a linear scale for the radius of the circles in the scatterplot.
+			           
+			//TODO: I have defined the axes below, please call them to add to SVG in the correct position
+				//Define X axis
+				xAxis = d3.axisBottom()
+								  .scale(xScale)
+								  .ticks(9)
+
+				//Define Y axis
+				yAxis = d3.axisLeft()
+								  .scale(yScale)
+								  .ticks(10);
+
+                                  
+
+				//Create SVG element
+				var svg = d3.select("body")
+							.append("svg")
+							.attr("width", w)
+							.attr("height", h);
+
+				
+				//TODO: draw your scatterplot and then add x and y axes
+
+				
+	   			
+
+			});
+			
+		</script>
+	</body>
+</html>
