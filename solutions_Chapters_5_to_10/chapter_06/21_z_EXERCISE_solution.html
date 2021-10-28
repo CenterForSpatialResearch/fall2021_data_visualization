@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: SVG bar chart with value labels (centered)</title>
+		<script type="text/javascript" src="../d3.js"></script>
+		<style type="text/css">
+			/* No style rules here yet */		
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+            //ASSIGNMENT: familiarizing youself with drawing in svg 
+            //1. change the bar chart orientation so that it is horizontal(bars go across) instead of vertical, changing the placement of text as well to keep the number labels at the end of each bar
+            //2. change the bar chart colors so that instead of shades of blue, the colors are shades of red or green. (r,g,b)
+            
+			//Width and height
+			
+			var dataset = [ 50,22, 100, 130,300,20];
+			
+			//Create SVG element
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", 200)
+						.attr("height", 200);
+
+			svg.selectAll("rect")
+			   .data(dataset)
+			   .enter()
+			   .append("rect")
+                //HINT: start by switching the x and y values with eachother, and the width and height values with eachother. 
+                        //then adjust the y values such that they align on the bottom.
+			   .attr("x", function(d, i) {
+			   		return i*20
+			   })
+			   .attr("y", function(d) {
+			   		return 200-d
+			   })
+			   .attr("width", 10)
+			   .attr("height", function(d) {
+			   		return d
+			   })
+			   .attr("fill", function(d) {
+					return "rgb(200, "+Math.round(d*2)+", " + Math.round(d * 10) + ")";
+			   })
+         .attr("opacity",.5);
+		
+
+
+			
+		</script>
+	</body>
+</html>
