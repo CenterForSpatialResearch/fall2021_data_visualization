@@ -23,14 +23,14 @@
             var w = 800
             var h = 600
             //basic svg setup
-            var tempData = [0,20,30,40,30,20,20]
+            var tempData = [0,20,3,12,45]
 
             var svg = d3.select("body").append("svg").attr("width",w).attr("height",h)
             
            //The scales for x and y
             var yScale = d3.scaleLinear()
                 .domain([0,90])
-                .range([0,h])
+                .range([h,0])
             //x uses the index value to place the dots evenly across
             //can of course be ordinal using band
             var xScale = d3.scaleLinear().domain([0,tempData.length]).range([0,w])

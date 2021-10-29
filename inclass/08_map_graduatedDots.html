@@ -16,7 +16,9 @@
         var width = window.innerWidth
         var height = window.innerHeight
 
-        var svg = d3.select("body").append("svg").attr("width",width).attr("height", height);           
+        var svg = d3.select("body")
+			.append("svg").attr("width",width)
+			.attr("height", height);           
 
         var geoPath = "nyc_boroughs.geojson";
         var dataPath = "NYC_Parks_Events_2019.csv";
@@ -29,11 +31,14 @@
             });
             
             function drawOutline(geo){
-                var padding = 50
-                var projection = d3.geoAlbers()
-                        .fitExtent([[padding,padding],[width-padding,height-padding]],geo)
-                var path = d3.geoPath().projection(projection);
-                svg.append("path")
+                var padding = 10
+                var myProjection = d3.geoAlbers()
+                      
+.fitExtent([[padding,padding],[width-padding,height-padding]],geo)
+               
+			    var path = d3.geoPath().projection(myProjection);
+               
+			    svg.append("path")
                     .attr("d", path(geo))
                     .attr("fill", "none")
                     .attr("stroke", "#000000")
@@ -41,31 +46,34 @@
             }
             
             function drawDots(places,geo){              
-                var padding = 50
+                var padding = 10
                 var projection = d3.geoAlbers()
                         .fitExtent([[padding,padding],[width-padding,height-padding]],geo)
         
               var parkDictionary = {}
               var parkCoordinates = {}
               
+			  
               for(var p in places){
                 var parkId = places[p]["park_id"]                
                 var currentKeys = Object.keys(parkDictionary)
                 
-                if(currentKeys.indexOf(parkId)==-1){
+				  if(currentKeys.indexOf(parkId)==-1){
                   parkDictionary[parkId]=1
                   parkCoordinates[parkId]=[places[p]["lat"],places[p]["long"]]
                 }else{
                   parkDictionary[parkId]+=1
                 }
               }
+			  var rScale = d3.scaleLinear().domain([1,300]).range([3,10])
                              
                 svg.selectAll("circle")
                 	.data(Object.keys(parkDictionary))
                     .enter()
                 	.append("circle")
                 	.attr("r", function(d){
-                	  return parkDictionary[d]/10
+						console.log(d)
+                	  return rScale(parkDictionary[d])
                 	})
                 	.attr("cx", function(d) {
                   	    return projection([parkCoordinates[d][1],parkCoordinates[d][0]])[0]
@@ -74,6 +82,7 @@
                   	    return projection([parkCoordinates[d][1],parkCoordinates[d][0]])[1]
                 	})
                 	.attr("opacity", 1)
+				//	.on("mouseover",....)
             }
 </script>
 </body>

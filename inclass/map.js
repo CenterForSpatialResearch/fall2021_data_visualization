@@ -19,8 +19,8 @@
             //console.log(data)//try uncommenting and seeing what data is at this point to get a better idea
             var park = data[1]
             
-            drawOutline(geo) //call the draw outline function from below 
             drawCircles(park,geo)
+            drawOutline(geo) //call the draw outline function from below 
             
         });
         
@@ -31,19 +31,18 @@
             var projection = d3.geoAlbers()
                     .fitExtent([[padding,padding],[width-padding,height-padding]],geo)
             
-            var parkObj = {}
-            for(var p in park){
-                var parkId = park[p]["park_id"]
-                
-                var currentParkKeys = Object.keys(parkObj)
-                
-                if(currentParkKeys.indexOf(parkId)==-1){
-                    parkObj[parkId]=1
-                }else{
-                    parkObj[parkId]=parkObj[parkId]+1
-                }
-            }
-            console.log(parkObj)
+            // var parkObj = {}
+       //      for(var p in park){
+       //          var parkId = park[p]["park_id"]
+       //
+       //          var currentParkKeys = Object.keys(parkObj)
+       //
+       //          if(currentParkKeys.indexOf(parkId)==-1){
+       //              parkObj[parkId]=1
+       //          }else{
+       //              parkObj[parkId]=parkObj[parkId]+1
+       //          }
+       //      }
             
             svg.selectAll("circle")
             .data(park)
@@ -51,8 +50,7 @@
             .append("circle")
             .attr("cx",function(d,i){
                 var lat = d.lat
-                var lng = d.long
-                
+                var lng = d.long                
                 return projection([lng,lat])[0]
             })
             .attr("cy",function(d,i){

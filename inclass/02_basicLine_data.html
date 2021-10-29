@@ -24,16 +24,18 @@
 	        var dataset = d3.csv("time_scale_data.csv")
 
 
-	        Promise.all(
-	          [dataset]
-	        )
+	        Promise.all([dataset])
 	        .then(function(data){
-					
+				// console.log(data)
+// 				console.log(data[0])
 					var lineData = data[0]
 		            var w = 800
 		            var h = 600
 		            //basic svg setup
-		            var svg = d3.select("body").append("svg").attr("width",w).attr("height",h)
+		            var svg = d3.select("body")
+								.append("svg")
+								.attr("width",w)
+								.attr("height",h)
 			
 		                       //The scales for x and y
 		            var yScale = d3.scaleLinear()

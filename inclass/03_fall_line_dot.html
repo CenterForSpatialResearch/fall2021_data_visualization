@@ -26,14 +26,19 @@
         .then(function(data){
             
             var svg = d3.select("body").append("svg").attr("width",w).attr("height",h)
-            
+			
+			
             lineChart(data,"c1",svg,"red")
             lineChart(data,"c2",svg,"green")
             lineChart(data,"c3",svg,"gold")
+
+            lineChart(data,"c4",svg,"green")
+            lineChart(data,"c5",svg,"gold")
         })
             
             
     function lineChart(data,column,svg,color){
+	
             
             var yScale = d3.scaleLinear()
                 .domain([0,90])
@@ -51,6 +56,7 @@
             svg.append("path")
                 .data([data])
                 .attr("d",line)
+				 .attr("class",column+"_line")
                 .attr("fill", "none")
                 .attr("stroke", color)
         
@@ -58,6 +64,7 @@
              .data(data)
              .enter()
              .append("text")
+			 .attr("class",column+"_label")
              .text(function(d){
                  return d[column]
              })
@@ -68,10 +75,11 @@
                  return yScale(parseInt(d[column]))+2
              })
              
-         svg.selectAll("circle")
+         svg.selectAll("."+column)
              .data(data)
              .enter()
              .append("circle")
+			 .attr("class",column)
                  .attr("cx",function(d,i){
                         return xScale(i)
                  })
@@ -80,6 +88,22 @@
                  })
                  .attr("r",3)
                  .attr("fill","black")
+				 .on("mouseover",function(d){
+				 	var thisClass = d3.select(this).attr("class")
+					 d3.selectAll("."+thisClass).attr("r",10)
+					 d3.selectAll("."+thisClass+"_label")
+					 .attr("fill","red")
+					 d3.selectAll("."+thisClass+"_line")
+					 .attr("stroke-width",4)
+				 })
+				 .on("mouseout",function(d){
+				 	var thisClass = d3.select(this).attr("class")
+					 d3.selectAll("."+thisClass).attr("r",3)
+					 d3.selectAll("."+thisClass+"_label")
+					 .attr("fill","black")
+					 d3.selectAll("."+thisClass+"_line")
+					 .attr("stroke-width",1)
+				 })
         
     }    
       
