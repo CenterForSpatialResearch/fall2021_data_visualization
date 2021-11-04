@@ -91,7 +91,7 @@ d3.select('#container')
 
 //the render function ties everything together
 function render(){
-var panelSize = window.innerHeight//each panel is the size of the window height
+	var panelSize = window.innerHeight//each panel is the size of the window height
     
   if (scrollTop !== newScrollTop) {//if the scroller has moved
       
