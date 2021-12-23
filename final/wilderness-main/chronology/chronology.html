@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>chronology scatterplot</title>
+		<script type="text/javascript" src="../d3.js"></script>
+		<style type="text/css">
+			/* No style rules here */		
+		</style>
+	</head>
+
+	<body>
+        <div id="tooltip" class="hidden"><p id="year"></p><p id="laws"></p></div>
+        <script type="text/javascript">
+
+            // chart width and height
+			var w = 1200;
+			var h = 600;
+			var padding = 80;
+			
+			var dataset, xScale, yScale, xAxis, yAxis, cScale;  // empty
+
+            //loading data 
+			d3.csv("wild-per-year.csv")
+            .then(function(data) {
+				// console.log(data);
+
+                xScale = d3.scaleLinear()
+                    .domain([
+                        d3.min(data, function(d){
+                            return parseInt(d["year"] - 1);
+                        }),
+                        d3.max(data, function(d){
+                            return parseInt(d["year"]);
+                        })
+                    ])
+                    .range([padding, w - padding]);
+
+                    // console.log(d3.max(data, function(d) {return d["year"]}))
+                
+                yScale = d3.scaleLinear() 
+                    .domain([
+                        -700,
+                        d3.max(data, function(d){ 
+                            return parseInt(d["acres-designated"].split(",").join(""));
+                        })
+                    ])
+                    .range([h - padding, padding])
+
+                
+                var rScale = d3.scaleLinear()
+                    .domain([
+                        d3.min(data, function(d){
+                            return parseInt(d["acres-designated"].split(",").join(""));
+                        })
+                        ,
+                        d3.max(data, function(d){
+                            return parseInt(d["acres-designated"].split(",").join(""));
+                        })
+                    ])
+                    .range([2,100]);
+                   
+                    
+                //define X axis
+				xAxis = d3.axisBottom()
+								  .scale(xScale)
+								  .ticks(30) //45 values in array
+                                  .tickFormat(d3.format("d"))
+
+				//define Y axis
+				yAxis = d3.axisLeft()
+								  .scale(yScale)
+								  .ticks(30);
+                                  
+
+				//create SVG element
+				var svg = d3.select("body")
+							.append("svg")
+							.attr("width", w)
+							.attr("height", h)
+                
+
+                    
+
+                //create circles
+                svg.selectAll("circle")
+				   .data(data)
+				   .enter()
+				   .append("circle")
+				   .attr("cx", function(d) {
+                    // console.log(parseInt(d["year"]))
+                        return xScale(parseInt(d["year"]));
+				   })
+				   .attr("cy", function(d, i) { //WHY ADD i HERE?
+                        return yScale(d["acres-designated"].split(",").join(""));
+				   })
+				   .attr("r", function(d){
+                    // console.log([d["acres-designated"], rScale(d["acres-designated"])])
+					// return 5
+                        return rScale(Math.abs(d["acres-designated"].split(",").join("")))
+                    })
+
+                    // circle colors
+                    .style("fill", function(d){
+                       //console.log(d)
+                       if(d.party== "Democratic"){
+                           return "blue"
+                       }else{
+                           return "red"
+                       }
+                    })
+                    .style("cursor", "pointer")
+
+                    //show tooltip
+                    .on("mouseover", function(d){
+
+                        var xPosition = parseFloat(d3.select(this).attr("cx"));
+                        var yPosition = parseFloat(d3.select(this).attr("cy"));
+                        
+                        d3.select("#tooltip")
+                            .style("left", xPosition + "px")
+                            .style("top", yPosition + "px")
+                            .select("#year")
+                            .text(d.year) 
+                        d3.select("#tooltip")
+                            .select("#laws")
+                            .text(d.legislation);
+                    })
+
+                    //hide tooltip
+                    .on("mouseout",function(d,i){
+					   d3.select("#tooltip").classed("hidden", true);
+                    })
+                
+            
+                //create x axis
+                svg.append("g")
+                    .attr("class", "axis")
+                    .attr("transform", "translate(0," + (h - padding) + ")")
+                    .call(xAxis);
+			
+			    //create Y axis
+			    svg.append("g")
+                    .attr("class", "axis")
+                    .attr("transform", "translate(" + padding + ",0)")
+                    .call(yAxis);
+
+
+            });
+
+        </script>
+	</body>
+</html>

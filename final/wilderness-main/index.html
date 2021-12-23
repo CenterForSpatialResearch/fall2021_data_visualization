@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>American Wilderness</title>
+
+    <link rel="stylesheet" href="style.css">
+    <script src="d3.js"></script>
+    <!-- <script src="https://d3js.org/d3.v4.min.js"></script>     -->
+    <script src="visualizations.js"></script>
+
+</head>
+<body>
+
+    <aside class="nav-fixed-top">
+    <header>    
+        <h1>American Wilderness</h1>
+    </header>
+
+    <nav>
+        <ul class="nav-bar"> 
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#chronology">Chronology</a></li>
+            <li><a href="#states">States</a></li>
+            <li><a href="#nation">Nation</a></li>
+            <li><a href="#data">Data</a></li>
+            <li><a href="#about">About</a></li>
+        </ul>
+    </nav>
+    </aside>
+
+    <div class="container">
+        <section id="introduction">
+            <h2>Introduction</h2>
+            <p>"The time has come to rethink wilderness." William Cronan, <em>The Trouble with Wilderness</em>, 1995</p>
+            <p>The Wilderness Act of 1964 established a legal definition for the term wilderness and the National Wilderness Preservation System. This national network of federally-designated wilderness areas are nominated and protected by the Bureau of Land Management, US Forest Service, US Fish and Wildlife Service, and the National Park Service.</p>
+            <img src="images/wilderness1964.PNG" width="100%" height=auto>
+        </section>
+
+        <br><br>
+
+        <section id="chronology">
+            <h2>Chronology</h2>
+            <p>In order for an area to become wilderness it must first be recommended and evaluated. It takes an act of Congress to designate a wilderness unit. This process may take years, or even decades.</p>
+            <p>Practical criteria for recommendations include (1) the area must be 5,000 acres in size or larger (or a roadless island) and (2) the area must appear to be natural (ie. without human presence). Wild lands that do not meet the criteria may be given a different designation with less strict protections.</p>
+            <p class="chart-title">Acres designated since 1964</p>
+            <div id="chronology-plot"></div>
+            <p>Hover over a circle to learn which legislations were passed during what year. [Red circles indicate a Republican candidate was in office; blue, a Democrat.]</p>
+            <div id="tooltipChronology" class="hidden">
+                <p id="year"></p>
+                <p id="acres-designated"></p>
+                <p id="laws"></p></div>
+            <br><br>
+            <p class="chart-title">Individual units of wilderness designated since 1964</p>
+            <div id="units-plot"></div>
+            <p>Hover over a circle to learn more about when individual wilderness units were designated and how many acres were conserved.</p>
+            <div id="tooltipUnits" class="hidden">
+                <p id="year"></p>
+                <p id="size"></p>
+                <p id="name"></p></div>
+            </section>
+
+        <br><br>
+
+        <section id="states">
+            <h2>States</h2>
+            <p>The following charts break down the percentages of public lands owned and managed by various federal agencies. The inner ring visualizes how much of the public lands of that state are federally-designated wilderness areas.</p>
+            <img src="images/color-legend.png" alt="color legend" width=80% height=auto>
+            <br><br>
+            <div id="state-donuts"></div>
+            <div id="tooltipStates" class="hidden">
+                <p id="agency-name"></p> 
+                <p><span id="acreage"></span></p>
+            </div>
+        </section>
+
+        <br><br>
+
+        <section id="nation">
+            <h2>Nation</h2>
+            <p>How much of America's public lands are managed with the strictest conservation principles? Click on the buttons below to see which agencies have the most untrammelled-by-man wild lands under their jurisdiction.</p>
+            <p class="chart-title">Wilderness designations per federal agency's land holdings</p>
+            <button onclick="update(data_total)">Agency Land</button>
+            <button onclick="update(data_wilderness)">How much is Wilderness?</button>
+            <div id="bar-wild"></div>
+    
+            <!-- BAR - WILDERNESS PER AGENCY -->
+            <script type="text/javascript">
+    
+            var colors1 = [
+                "#c48b3a",  //BLM
+                "#927c41",  //FS
+                "#9d6b42",  //FWS
+                "#bc422a",  //NPS
+                "#f2d59a",  //DOD
+                ]
+    
+            var data_total = [
+                {agency: "Bureau of Land Management", acres: 244400000},
+                {agency: "Forest Service", acres: 192900000},
+                {agency: "Fish and Wildlife Service", acres: 89200000},
+                {agency: "National Park Service", acres: 79900000},
+                {agency: "Department of Defense", acres: 8800000}
+            ];
+                
+            var data_wilderness = [
+                {agency: "Bureau of Land Management", acres: 9986645},
+                {agency: "Forest Service", acres: 36670166},
+                {agency: "Fish and Wildlife Service", acres: 20702709},
+                {agency: "National Park Service", acres: 44337407},
+                {agency: "Department of Defense", acres: 0}
+            ];
+    
+            // set the dimensions and margins of the graph
+            var margin = {top: 20, right: 60, bottom: 60, left: 60},
+                width = 800 - margin.left - margin.right,
+                height = 400 - margin.top - margin.bottom;
+    
+            // append the svg object to the body of the page
+            var svg = d3.select("#bar-wild")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+    
+            // X axis
+            var x = d3.scaleBand()
+            .range([ 0, width ])
+            .domain(data_total.map(function(d) { return d.agency; }))
+            .padding(0.2);
+            svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x))
+    
+            // Add Y axis
+            var y = d3.scaleLinear()
+                .domain([0, 244400000])
+                .range([ height, 0]);
+            svg.append("g")
+                .attr("class", "myYaxis")
+                .call(d3.axisLeft(y));
+    
+            // A function that create / update the plot for a given variable:
+            function update(data) {
+    
+            var u = svg.selectAll("rect")
+                .data(data)
+    
+            u
+                .enter()
+                .append("rect")
+                .merge(u)
+                .transition()
+                .duration(1000)
+                .attr("x", function(d) { return x(d.agency); })
+                .attr("y", function(d) { return y(d.acres); })
+                .attr("width", width / 6)
+                .attr("height", function(d) { return height - y(d.acres); })
+                .attr("fill", function(d, i){
+                       return colors1[i]
+                   })        
+                }
+    
+            // Initialize the plot with the first dataset
+            update(data_total)
+    
+            </script>
+
+
+            <br>
+            <br>
+            <p>The federal government owns approximately 28% of land in the United States. The majority of federal lands is overseen by five agencies: Bureau of Land Management (BLM), National Park Service (NPS), Fish and Wildlife Service (FWS), Forest Service (FS), and the Department of Defense. Overall, only about 5% of the entire US is protected as wilderness. Alaskan wilderness accounts for almost half of the total; therefore, 2.7% is in the contiguous US.</p>
+            <p class="chart-title">Land ownership per federal agency</p>
+            <div id="bar-total"></div>
+
+            <!-- BAR - TOTAL USA -->
+            <script type="text/javascript">
+
+                // chart width and height
+                var w = 1000;
+                var h = 300;
+                var barPadding = 5
+                var margin = 200
+                var xMargin = 40
+                
+                var dataset; 
+    
+                var colors = [
+                "#d4d4d4",	//non-federal
+                "#c48b3a",  //BLM
+                "#927c41",  //FS
+                "#9d6b42",  //FWS
+                "#bc422a",  //NPS
+                "#f2d59a",  //DOD
+                "#000000"   //other
+                ]
+    
+            //loading data
+            Promise.all([d3.csv("introduction/fed-total.csv")])
+            .then(function(data){	
+                drawChart(data[0])
+            })
+            
+            function drawChart(dataset){
+                
+                var xScale = d3.scaleLinear().domain([
+                    0
+                    ,
+                    d3.max(dataset, function(d){return parseInt(d.TotalAcres);})
+                    ])
+                    .range([0,w])
+    
+                var xAxis = d3.axisBottom()
+                    .scale(xScale)
+                    .ticks(10)
+                
+                // SVG element
+                var svg = d3.select("#bar-total")
+                            .append("svg")
+                            .attr("width", w)
+                            .attr("height", h+xMargin);
+    
+                // create bars			
+                svg.selectAll("rect")
+                   .data(dataset)
+                   .enter()
+                   .append("rect")
+                   .attr("y", function(d, i) {
+                       return i * (h / dataset.length)
+                   })
+                   .attr("x", function(d) {
+                           return 0 + margin
+                   })
+                   .attr("height", h / dataset.length - barPadding)
+                   .attr("width", function(d) {
+                           return xScale(d.TotalAcres)
+                   })
+                   .attr("fill", function(d, i){
+                       return colors[i]
+                   })
+    
+                svg.selectAll("labels")
+                   .data(dataset)
+                   .enter()
+                   .append("text")
+                   .text(function(d){
+                       return d.Agency;
+                   })
+                   .attr("y", function(d, i) {
+                       return (i * (h / dataset.length)) +28 // HOW DO I CENTER TEXT IN MIDDLE OF BAR?
+                   })
+                    .attr("x", margin - 10)
+                       .attr("text-anchor", "end")
+    
+                // xAXIS 
+                svg.append("g")
+                   .attr("class", "axis")
+                   .attr("transform", "translate(" + margin +"," + h + ")")			   
+                   .call(xAxis)
+    
+            };
+            </script>
+
+
+        </section>
+
+        <br><br>
+
+        <section id="data">
+            <h2>Data</h2>
+            <p>The primary data source for these visualizations is collected and maintained by <a href="https://wilderness.net/default.php">Wilderness Connect</a> at the University of Montana.</p>
+        </section>
+
+        <br><br>
+
+        <section id="about">
+            <h2>About</h2>
+            <p>This project was researched, designed, and developed by Spenser A. Krut for two visual studies electives at Columbia GSAPP: Coding for Spatial Practices with Celeste Layne and Data Visualization For Architecture, Urbanism, and the Humanities with Jia Zhang.</p>
+            <p>Published and last updated on December 20, 2021.</p>
+            <br>
+            <a href="#introduction"><em>_go to top</em></a>
+        </section>
+
+    </div>
+</body>
+</html>

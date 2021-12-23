@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>units scatterplot</title>
+		<script type="text/javascript" src="../d3.js"></script>
+		<style type="text/css">
+			/* No style rules here */		
+		</style>
+	</head>
+
+	<body>
+        <div id="units-tooltip" class="hidden"><p id="year"></p><p id="name"></p><p id="size"></p>
+        <script type="text/javascript">
+
+            // chart width and height
+			var w = 1200;
+			var h = 600;
+			var padding = 80;
+
+            var colorDictionary = {
+                    BLM: "#c48b3a",
+                    FS: "#927c41",
+                    FWS: "#9d6b42",
+                    NPS: "#bc422a",
+                    DOD: "#f2d59a"
+                }
+			
+			var dataset, xScale, yScale, xAxis, yAxis, cScale;  // empty
+
+            //loading data 
+			d3.csv("wild-units-new.csv")
+            .then(function(data) {
+				// console.log(data);
+
+                xScale = d3.scaleLinear()
+                    .domain([
+                        d3.min(data, function(d){
+                            return parseFloat(d["year"]) - 1;
+                        }),
+                        d3.max(data, function(d){
+                            return parseFloat(d["year"]);
+                        })
+                    ])
+                    .range([padding, w - padding]);
+
+                    // console.log(d3.max(data, function(d) {return d["year"]}))
+                
+                yScale = d3.scaleLinear() 
+                    .domain([
+                        0,
+                        d3.max(data, function(d){ 
+                            return Math.sqrt(parseInt(d["Unit_acres"].split(",").join("")));
+                        })
+                    ])
+                    .range([h - padding, padding])
+
+                
+                var rScale = d3.scaleLinear()
+                    .domain([
+                    //     d3.min(data, function(d){
+                    //         return parseInt(d["Unit_acres"].split(",").join(""));
+                    //     })
+                        0
+                        ,
+                        d3.max(data, function(d){
+                            return parseInt(d["Unit_acres"].split(",").join(""));
+                        })
+                    ])
+                    .range([2,80]);
+                   
+                    
+                //define X axis
+				xAxis = d3.axisBottom()
+								  .scale(xScale)
+								  .ticks(30) //45 values in array
+                                  .tickFormat(d3.format("d"))
+
+				//define Y axis
+				yAxis = d3.axisLeft()
+								  .scale(yScale)
+								  .ticks(30);
+                                  
+
+				//create SVG element
+				var svg = d3.select("body")
+							.append("svg")
+							.attr("width", w)
+							.attr("height", h)
+                
+
+                //create circles
+                svg.selectAll("circle")
+				   .data(data)
+				   .enter()
+				   .append("circle")
+				   .attr("cx", function(d, i) {
+                    // console.log(parseInt(d["year"]))
+                        // return xScale(parseInt(d["year"]));
+                        if (i%2) {
+                            return xScale(parseInt(d["year"]))
+                        }else{
+                            return xScale(parseInt(d["year"])) + 6
+                        }
+				   })
+				   .attr("cy", function(d, i) { 
+                        return yScale(Math.sqrt(d["Unit_acres"].split(",").join("")));
+				   })
+				   .attr("r", function(d){
+                    // console.log([d["acres-designated"], rScale(d["acres-designated"])])
+					// return 5
+                        return rScale(d["Unit_acres"].split(",").join(""))
+                    })
+                
+
+                    // circle colors
+                   .style("fill", function(d){
+                        return colorDictionary[d.Agency]
+                   })
+                   .style("opacity", .75)
+            
+
+                    //show tooltip
+                    .on("mouseover", function(d){
+
+                        var xPosition = parseFloat(d3.select(this).attr("cx"));
+                        var yPosition = parseFloat(d3.select(this).attr("cy"));
+                        d3.select("#units-tooltip")
+                            .style("left", xPosition + "px")
+                            .style("top", yPosition + "px")
+                            .select("#year")
+                            .text(d.year) 
+                        d3.select("#name")
+                            .text(d.Name)
+                        d3.select("#size")
+                            .text(d.Unit_acres);
+                    })
+
+                    //hide tooltip
+                    .on("mouseout",function(d,i){
+                       d3.select(this).attr("fill","black")
+					   d3.select("#units-tooltip").classed("hidden", true);
+                    })
+
+
+                //create x axis
+                svg.append("g")
+                    .attr("class", "axis")
+                    .attr("transform", "translate(0," + (h - padding) + ")")
+                    .call(xAxis);
+			
+			    //create Y axis <-- MESSED UP BECAUSE xScale SQRT 
+			    // svg.append("g")
+                //     .attr("class", "axis")
+                //     .attr("transform", "translate(" + padding + ",0)")
+                //     .call(yAxis);
+
+            });
+
+        </script>
+	</body>
+</html>

@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Every person to appear on TIME Magazine’s cover from 2000 to now</title>
+		<script type="text/javascript" src="d3.js"></script>
+		<style type="text/css">
+			body{
+				text-align:center;
+			}
+			
+			#tooltip {
+			position: absolute;
+			width: 200px;
+			height: auto;
+			padding: 10px;
+			background-color: rgba(255, 255, 255, 0.9);
+			-webkit-border-radius: 5px;
+			-moz-border-radius: 5px;
+			border-radius: 5px;
+			-webkit-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); 
+			-moz-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); 
+			box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); 
+			pointer-events: none;
+			text-align:left
+			}
+			
+			#tooltip.hidden { display: none;
+			}
+			#tooltip p { margin: 0;
+			font-family: sans-serif; font-size: 10px;
+			line-height: 15px; }
+			
+			#pie {
+				position:relative;
+			}
+			
+			#BarKeys {
+			position: absolute;
+			  top: 280px;
+			  right: 50px;
+			}
+			
+
+			#BarKeys.center {
+			  position: relative;
+  			  width: 200px;
+  			  height: 100px;
+			  text-align: center;
+			}
+			
+			#BarKeys.hidden { display: none;
+			}
+			
+			#BarKeys p { margin: 0;
+			font-family: sans-serif; 
+			font-size: 10px; }
+			
+			#buttonOccupation, #buttonCover {
+			width: 110px;
+			height: auto;
+			padding: 6px;
+			background-color: rgba(255, 255, 255, 1);
+			border-width: 1px;
+			border-color: black;
+			border-style: solid;
+			margin: 0;
+			font-family: Times New Roman; 
+			font-size: 12px;
+			line-height: 12px; 
+			}
+			
+			#buttonHome, #button2, #button3 {
+			width: 160px;
+			height: auto;
+			padding: 6px;
+			background-color: rgba(0, 0, 0, 1);
+
+			margin: 20;
+			font-family: Times New Roman; 
+			font-size: 14px;
+			line-height: 14px;
+			color: white; 
+			}
+			
+			a:link {
+			  color: white;
+			}
+			
+			a:visited {
+			  color: white;
+			}
+			
+			a:hover {
+			  color: red;
+			}
+			
+			p.closer {
+			  line-height: 1;
+			}
+			
+			p.further {
+			  line-height: 1.3;
+			  text-align:left
+			}
+			
+			
+			.displayInline{
+				display:inline-block;
+			}
+			
+				
+		</style>
+
+	</head>
+	<body>
+		<div id="tooltip" class="hidden"> <p><strong><span id="Name"></span></strong></p> 
+			 <p> Cover release date: <span id="Date"></span></p> 
+			 <p> Nationality: <span id="Nationality"></span></p>  
+			 <p> Birth Year: <span id="Birth_Year"></span></p>
+			 <p><span id="Occupation_Detail"></span></p>
+		</div>
+		
+		
+		<div><strong><p style="font-size: 18px; font-family: Times New Roman;" class="closer"> Every person to appear on TIME Magazine’s cover from 2000 to now </p></strong>
+		<p style="font-size: 12px; font-family: sans-serif;padding-left: 15%; padding-right: 15%;"  class="further"> What types of people tend to be featured on TIME covers? We painstakingly flipped through every single issue to find every person featured from the beginning of 2000 all the way to the latest cover in 2021. The result? Politics and entertainment reign supreme. </p>
+	    </div>
+		
+		<div id="buttonOccupation" class="displayInline" style="margin-left: 10px; margin-right: 10px; margin-top: 10px;margin-bottom: 10px"><strong>Sort by occupation</strong></div>
+		<div id="buttonCover" class="displayInline" style="margin-left: 10px; margin-right: 10px"><strong>Sort by issue date </strong></div> <br/>
+		
+		<div id="bar" class="displayInline" style="margin-left: 10px; margin-right: 10px"></div>
+		<div id="pie" class="displayInline"><div id="BarKeys" class="hidden" > <p><span id="Occupation">100</span></p></div></div>
+		<br/>
+		
+		<div id="buttonHome" class="displayInline" style="margin:30px"><a href="HomePage.html"><strong>Home</strong></a ></div>
+		<div id="button2" class="displayInline" style="margin:30px"><a href="Chart02_Mapping.html"><strong>Map</strong></a ></div>
+		<div id="button3" class="displayInline" style="margin:30px"><a href="Chart03_heads.html"><strong>The TIME 3-timer club</a ></strong></div><br/>
+			
+		<div> 
+		   <p style="font-size: 10px; font-family: sans-serif; padding-left: 12%; padding-right: 12%; padding-top: 85px" > Dataset: https://time.com/vault/ <br /> Produced by: Kenney Zhou, Rongxin Tang, Shuhua Li <br /> Data Visualization Final Project <br /> DEC. 2021
+           </p><br />
+		   <img src="gsapplogo.png" style="height:50px;">
+	    </div>
+			
+		<script type="text/javascript">
+			
+			var w = 600;
+			var h = 600;
+			var padding = 100;
+			
+
+			var file = d3.csv("timecovers_final.csv")
+			Promise.all([file])
+			.then(function(data){
+				
+				var myData = data[0];
+				
+                var coverDictionary = {}
+
+	            for(var n in myData){
+                  var eachCover = myData[n]["Cover"]   
+		            if(eachCover!=undefined){  
+                      var coverKeys = Object.keys(coverDictionary)
+
+	                   if(coverKeys.indexOf(eachCover)==-1){
+                          coverDictionary[eachCover]=1   
+                       }else{
+                          coverDictionary[eachCover]+=1
+                       }
+	                }
+                }
+				
+
+    console.log(coverDictionary)
+
+				
+				
+	            var byYear = {}
+                for(var m in myData){
+                  var year = myData[m]["Year"]  
+		            if(year!=undefined){
+	                  var currentKeys = Object.keys(byYear)
+			            if(currentKeys.indexOf("_"+year)==-1){
+			            	byYear["_"+year]=[]//NEW
+			              byYear["_"+year].push(myData[m])
+		    
+	                  }else{
+			              byYear["_"+year].push(myData[m])
+	                  }
+		            }
+    
+                }
+	//console.log(byYear)
+				
+				
+
+	
+	
+
+	
+			  drawChart(byYear)	
+		
+	
+	
+
+               var yScale = d3.scaleLinear()
+							.domain([2000,2021])
+			                .range([0,h]);
+							   
+            d3.select("#buttonOccupation").style("cursor","pointer")
+            .on("click",function(){
+				d3.select("#allYearsChart").remove()
+				var  byYearSorted = {}
+				for(var by in byYear){
+					var dataForYear = byYear[by]
+   		         	var sorted = dataForYear.sort(function(a,b){
+   					  var textA = a["Occupation"].toUpperCase();
+   					  var textB = b["Occupation"].toUpperCase();
+   					  return (textA < textB)? -1 : (textA < textB)? 1: 0;
+				  });
+   				  		//console.log(sorted)
+					  byYearSorted[by]=sorted
+			    }
+				
+			  	drawChart(byYearSorted) 
+			  })		
+			
+			
+            d3.select("#buttonCover").style("cursor","pointer")
+            .on("click",function(){
+				d3.select("#allYearsChart").remove()
+				var  byCoverSorted = {}
+				for(var by in byYear){
+					var dataForCover = byYear[by]
+   		         	var sorted2 = dataForCover.sort(function(a,b){
+						return d3.ascending(a["Cover"], b["Cover"]);
+					});
+   				  		//console.log(sorted)
+					  byCoverSorted[by]=sorted2
+			     }
+				
+			  	drawChart(byCoverSorted) 
+			  })	
+			  		
+		});
+
+			
+
+
+
+
+		  function drawChart(byYear){
+			var w = 600;
+			var h = 600;
+			var padding = 100;
+		  	
+            var svg = d3.select("#bar")
+		            	.append("svg")
+		            	.attr("width", w)
+		            	.attr("height", h)
+		            	.attr("id","allYearsChart");
+
+			var yIndex = 0
+			for(var by in byYear){
+				
+				var dataForYear = byYear[by]			  
+ 					 
+				yIndex+=1
+				//console.log(by)
+				var year = by.replace("_","")
+				svg.append('text')
+				.text(year)
+				.attr("x",10)
+				.attr("y",yIndex*25 + 13)
+      			.attr("font-family", "sans-serif")
+      			.attr("font-size", "10px")
+      			.attr("fill", "black")
+				
+			svg.selectAll("._"+by)
+				.data(dataForYear)
+				.enter()
+				.append("rect")
+				.attr("x", function(d,i){
+					return i*8+45;
+				})
+				.attr("y",function(d,i){
+					
+					return yIndex*25
+					//return  yScale(parseInt(d.Year));
+				})
+				.attr("width", 3)
+				.attr("height", 20)
+				.attr("class",function(d){
+					//console.log(d["Occupation"])
+					return d["Occupation"]+" _"+d["Year"]
+				})
+				.attr("id",function(d){
+					
+					return "_"+d["Cover"]
+				})
+				
+ 			    .attr("fill", color)
+				
+				.on("click",function(d){
+			    var thisClass = d3.select(this).attr("class")
+					var thisOccupation = thisClass.split(" ")[0]
+					console.log(thisOccupation)
+					d3.selectAll("rect").attr("opacity",.3)
+					d3.selectAll("."+thisOccupation).attr("opacity",1)
+				})
+
+   
+                 .on("mouseover",function(d,i){
+                     var xPosition = event.clientX;
+    				 var yPosition = event.clientY;
+				   d3.select("#tooltip")
+				     .select("#Date")
+				     .text(d.Date);
+				   d3.select("#Name")
+					 .text(d.Name);
+				   d3.select("#Nationality")
+					 .text(d.Nationality);
+				   d3.select("#Birth_Year")
+					 .text(d.Birth_Year);
+				   d3.select("#tooltip")
+					 .style("left",xPosition + "px")
+					 .style("top",yPosition + 10 + "px")
+					 .select("#Occupation_Detail")
+					 .text(d.Occupation_Detail);
+
+				   d3.select("#tooltip").classed("hidden", false);
+                 })
+				 
+				 
+                 .on("mouseout",function(d,i){
+				   d3.select("#tooltip").classed("hidden", true);
+                 });
+			};
+		
+		  };
+		  
+		  
+		  
+
+				
+				
+		  
+		  
+		  function color(d){
+			
+			if(d["Occupation"] == "Politics_Gov"){
+				return "#006896"
+			}else if(d["Occupation"] == "Science"){
+				return "#9180d6"
+			}else if(d["Occupation"] == "Business"){
+				return "#ffd24b"
+			}else if(d["Occupation"] == "Arts_Entertainment"){
+				return "#f47a7f"
+			}else if(d["Occupation"] == "Religion"){
+				return "#b6b6b6"
+			}else if(d["Occupation"] == "Social_Issues"){
+				return "#f7941e"
+			}else if(d["Occupation"] == "Sports"){
+				return "#91d9d2"
+			}else {
+			 return "#ce4e58";
+		    };
+		  	
+		  }
+		  
+
+
+
+
+
+
+		var w = 200;
+		var h = 600;
+		var padding = 60;
+           
+
+
+      var svg = d3.select("#pie")
+		.append("svg")
+		.attr("width",w)
+		.attr("height",h); 
+		
+		
+        d3.csv("Time_Cover_Occupation.csv")
+        .then(function(data){
+
+		var colors = d3.scaleOrdinal()
+		    .domain(["Arts_Entertainment", "Business", "Journalism", "Politics_Gov", "Religion", "Science", "Social_Issues", "Sports"])
+		    .range(["#f47a7f", "#ffd24b", "#ce4e58", "#006896", "#b6b6b6", "#9180d6", "#f7941e", "#91d9d2"]);
+
+//How to make colors and properties correspond to each other? This code only works halfway...
+			
+			
+       
+        pieChart(data, "Amount",60,80,svg,colors,100)
+    })
+
+        function pieChart(data,column,inner,outer,svg,colors,x){
+     
+        var pie = d3.pie()		
+        var arc = d3.arc().innerRadius(inner).outerRadius(outer)
+
+        var array = []
+
+        for(var d in data){
+			if(data[d][column]!=undefined){
+            	array.push(data[d][column])
+			}
+        }
+//console.log(array)
+
+        var arcs = svg.selectAll("g.arc")
+                .data(pie(array))
+                .enter()
+                .append("g")
+                .attr("class",column)
+                .attr("transform", "translate(" + x + "," + h/2 + ")")
+                
+				.append("path")
+                .style("fill", function(d,i) {
+					return colors(i);
+                   })
+                .attr("stroke","#ffffff")
+                .attr("stroke-width",2)
+                .attr("d", arc)
+				.attr("align","center")
+			
+				.on("click",function(d,i){
+					d3.selectAll("path").style("opacity",.2)
+					d3.select(this).style("opacity",1)
+					console.log(data[i]["Occupation"])
+					var thisOccupation = data[i]["Occupation"]
+									d3.selectAll("rect").attr("opacity",.3)
+									d3.selectAll("."+thisOccupation).attr("opacity",1)
+					
+
+
+
+			  	     d3.select("#BarKeys")
+					   .select("#Occupation")
+					     .style("left",600 + "px")
+				 	     .style("top",800 + "px")	
+					     .classed("center", false)					 
+						 .html(data[i]["Occupation"]+"<br>"+d.data+"<br>"+Math.round(d.data/754*100)+"%");
+
+						 d3.select("#BarKeys").classed("hidden", false);
+
+					
+				});
+				
+
+
+   
+        };
+		
+
+
+
+		
+			
+		</script>
+	</body>
+</html>

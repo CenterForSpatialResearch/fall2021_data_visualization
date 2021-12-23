@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>The TIME 3-timer club: who has appeared the most?</title>
+		<script type="text/javascript" src="../d3.js"></script>
+		<style type="text/css">
+			body{
+				text-align:center;
+			}
+			#buttonHome, #button2, #button1 {
+			position: 10px;
+			width: 160px;
+			height: auto;
+			padding: 6px;
+			background-color: rgba(0, 0, 0, 1);
+
+
+			margin: 20;
+			font-family: Times New Roman; 
+			font-size: 14px;
+			line-height: 14px;
+			color: white; 
+			}
+			
+			a:link {
+			  color: white;
+			}
+			
+			a:visited {
+			  color: white;
+			}
+			
+			a:hover {
+			  color: red;
+			}
+			
+			p.closer {
+			  line-height: 1;
+			}
+			
+			p.further {
+			  line-height: 1.3;
+			  text-align:left
+			}
+			
+			.displayInline{
+				display:inline-block;
+			}	
+			
+		</style>
+	</head>
+	<body>
+		<div><strong><p style="font-size: 18px; font-family: Times New Roman;" class="closer"> The TIME 3-timer club: who has appeared the most? </p></strong>
+		<p style="font-size: 12px; font-family: sans-serif;padding-left: 15%; padding-right: 15%;"  class="further"> Here, we have collected everyone who has appeared on a cover 3 times or more. These 42 individuals should be proud of themselves, because each 3-timer club member gets their face featured instead of a skinny bar like everyone else. Unsurprisingly, many politicians grace this club, with the former sitting presidents Trump, Obama, Bush garnering the most features. The only non-politicians to make it are: Greta Thunberg, Taylor Swift, Leonardo DiCaprio, Steve Jobs, Mark Zuckerberg, Jesus, and Elian Gonzalez (a Cuban child in the middle of a immigration case that made headlines back in 2000). </p>
+	    </div> <br />
+		
+		<div id="chart"></div><br/>
+		
+	
+		<div id="buttonHome" class="displayInline" style="margin:30px"><a href="HomePage.html"><strong>Home</strong></a ></div>
+		<div id="button1" class="displayInline" style="margin:30px"><a href="Chart01_Bars.html"><strong>Everyone</strong></a ></div>
+		<div id="button2" class="displayInline" style="margin:30px"><a href="Chart02_Mapping.html"><strong>Map</a ></strong></div><br/>
+			
+		<div> 
+		   <p style="font-size: 10px; font-family: sans-serif; padding-left: 12%; padding-right: 12%; padding-top: 85px" > Dataset: https://time.com/vault/ <br /> Produced by: Kenney Zhou, Rongxin Tang, Shuhua Li <br /> Data Visualization Final Project <br /> DEC. 2021
+           </p><br />
+		   <img src="gsapplogo.png" style="height:50px;">
+	    </div>
+		
+		<script type="text/javascript">
+
+
+
+            
+			//Width and height
+			var w = 1200;
+			var h = 600;
+			var padding = 75;
+			
+			var dataset, xScale, yScale, xAxis, yAxis;  //Empty, for now
+
+			//For converting strings to Dates
+
+			//For converting Dates to strings
+			var formatTime = d3.timeFormat("%e");
+
+			//Function for converting CSV values from strings to Dates and numbers
+		
+
+			//Load in the data
+			d3.csv("Repeat_people_for_Time_Covers.csv")
+            .then(function(data) {
+				//Copy data into global dataset
+				dataset = data;
+
+				//Create scale functions
+				xScale = d3.scaleLinear()
+			   					.domain([data.length, 0])
+			   				 	.range([w - padding, padding]);
+
+				yScale = d3.scaleLinear()
+							   .domain([
+									0,  //Because I want a zero baseline
+									d3.max(dataset, function(d) { return parseInt(d.Amount); })
+								])
+							   .range([h - padding, padding]);
+
+				//Define X axis
+				xAxis = d3.axisBottom()
+								 .scale(xScale)
+							  	 .ticks(0)
+								  //.tickFormat(formatTime);
+
+				//Define Y axis
+				yAxis = d3.axisLeft()
+								  .scale(yScale)
+								  .ticks(35);
+
+				//Create SVG element
+				var svg = d3.select("#chart")
+							.append("svg")
+							.attr("width", w)
+							.attr("height", h);
+
+				//Generate guide lines and circle at end of guide lines
+				svg.selectAll("line")
+				   .data(dataset)
+				   .enter()
+				   .append("line")
+				   .attr("x1", function(d,i) {
+				   		return xScale(i)+45;
+				   })
+				   .attr("x2", function(d,i) {
+				   		return xScale(i)+45;
+				   })
+				   .attr("y1", h - padding)
+				   .attr("y2", function(d) {
+				   		return yScale(d.Amount);
+				   })
+				   .attr("stroke", "red")
+				   .attr("stroke-width", 1);
+				   
+				   svg.selectAll("circle")
+				   .data(dataset)
+				   .enter()
+				   .append("circle")
+				   .attr("cx", function(d,i) {
+					   return xScale(i)+45;
+					})
+				   .attr("cy", function(d,i) {
+				   	   return (h - padding);
+				   })
+				   .attr("r", 3)
+				   .attr("fill", "red")
+				   
+				 
+
+
+				//Generate images last, so they appear in front
+				svg.selectAll(".img")
+				   .data(dataset)
+				   .enter()
+				   .append("image")
+				   .attr("class","img")
+				   .attr("xlink:href",function(d){
+					   var fileName = d.Amount+"_"+d.Name.split(" ").join("")+".png"
+					   return "HeadshotsPNG/"+fileName
+				   })
+				   .attr("width",35)
+				   .attr("height",35)
+				   .attr("x", function(d,i) {
+				   		return xScale(i)+26;
+				   })
+				   .attr("y", function(d) {
+				   		return yScale(d.Amount)-35;
+				   })
+                   .on("mouseover",function(d,i){
+                       d3.select(this).attr("opacity","50%")
+					   
+                       //tooltip here
+					   
+							var xPosition = parseFloat(d3.select(this).attr("x")) + 20
+							var yPosition = parseFloat(d3.select(this).attr("y")) - 25;
+
+							svg.append("text")
+							   .attr("id", "tooltipName")
+							   .attr("x", xPosition)
+							   .attr("y", yPosition)
+							   .attr("text-anchor", "middle")
+							   .attr("font-family", "Times New Roman")
+							   .attr("font-size", "14px")
+							   .attr("font-weight", "bold")
+							   .attr("fill", "red")
+							   .text(d.Name)
+							
+							var xPosition = parseFloat(d3.select(this).attr("x")) + 20
+							var yPosition = parseFloat(d3.select(this).attr("y")) - 5;
+
+							svg.append("text")
+							   .attr("id", "tooltipAmount")
+							   .attr("x", xPosition)
+							   .attr("y", yPosition)
+							   .attr("text-anchor", "middle")
+							   .attr("font-family", "Times New Roman")
+							   .attr("font-size", "14px")
+							   .attr("font-weight", "bold")
+							   .attr("fill", "black")
+							   .text(d.Amount);
+
+					   })
+					   
+                   .on("mouseout",function(d,i){
+                       d3.select(this).attr("opacity","100%")
+					   d3.select("#tooltipName").remove();
+					   d3.select("#tooltipAmount").remove();
+                   });
+	   			
+	   			//Create X axis
+	   			//svg.append("g")
+	   			//	.attr("class", "axis")
+	   			//	.attr("transform", "translate(0," + (h - padding) + ")")
+	   			//	.call(xAxis);
+	   			
+	   			//Create Y axis
+	   			svg.append("g")
+	   				.attr("class", "axis")
+	   				.attr("transform", "translate(" + padding + ",0)")
+	   				.call(yAxis);
+
+			});
+		
+			
+		</script>
+	</body>
+</html>

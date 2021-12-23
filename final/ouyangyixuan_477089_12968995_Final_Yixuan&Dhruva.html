@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8' />
+  <script src='d3.js'></script>
+  <title>COVID Impact on Restaurants in NYC</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="/jquery/jquery-1.11.1.min.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="mystyles.css" media="screen" />
+  <style>
+    body { margin:0; padding:0; }
+    img {
+        position:absolute;
+        top:0px;
+        width: 1400px;
+        height: 600px;
+        opacity:70%
+      }
+
+      #cbutton{
+        position: absolute;
+        top:2680px;
+        left:100px;
+      }
+      #buttons2021{
+        position:absolute;
+        top:4050px;
+        left:220px;
+        width:300px;
+        height:504px;
+        overflow:scroll;
+        border:1px solid black;
+      }
+      #chart2021{
+        position:absolute;
+        top:4050px;
+        left:520px;
+        border:1px solid black;
+      }
+
+    #map {
+      width:33%;
+      height:400px;
+      z-index:-1;
+      position:absolute;
+      top: 4850px;
+      left: 200px;}
+
+    #layerToggle{z-index:999;}
+
+    #menu {
+      background: #fff;
+      position: absolute;
+      z-index: 1;
+      top: 4850px;
+      left: 200px;
+      border-radius: 3px;
+      width: 350px;
+      height: 30px;
+      border: 1px solid rgba(0, 0, 0, 1);
+      font-family: 'helvetica', monospace;
+    }
+
+    #chart {
+      background: #fff;
+      position: absolute;
+      z-index: 1;
+      top: 2700px;
+      left:0px;
+      height: 50%;
+      border-radius: 3px;
+      width: auto;
+      font-family: 'helvetica', monospace;
+    }
+
+
+
+
+    #text {background: #fff;
+    position: absolute;
+    z-index: 1;
+    top: 800px;
+    right: 600px;
+    font-family: 'helvetica', monospace;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 0px;
+    text-transform:uppercase;
+    border: 4px solid rgb(255, 255, 255);
+  }
+
+    }
+
+
+    #menu a {
+      font-size: 15px;
+      color: #fff;
+      display: block;
+      margin: 0;
+      padding: 0;
+      padding: 10px;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+      text-align: center;
+    }
+    #menu a:last-child {
+      border: none;
+    }
+
+    #menu a:hover {
+      background-color: #f8f8f8;
+      color: #404040;
+    }
+
+    #menu a.active:hover {
+      background: #272172;
+    }
+
+
+
+  </style>
+</head>
+<body>
+  <select id="cbutton" onChange="updateColumn(this.value)" >
+      <option>Year2019</option>
+      <option>Year2020</option>
+      <option>Year2021</option>
+  </select>
+<nav id="menu"></nav>
+<div id='chart'></div>
+<div id='map'></div>
+<div id='title'>  COVID Impact on Restaurants in NYC  </div>
+
+<div id="buttons2021">Choose Your Cuisine</div>
+<div id="chart2021"></div>
+
+<p>
+<img src="	https://cdn.cnn.com/cnnnext/dam/assets/200725125414-01-closed-restaurant-file-exlarge-169.jpg"/>
+</p>
+
+<p>
+<img src="https://miro.medium.com/max/1260/1*C4YMkXVYSdP8znQOg5lHQw.jpeg" style="
+position:absolute;
+top:1050px;
+width: 50%;
+height: 50%;
+left: 300px;
+opacity:100%"/>
+</p>
+
+<p>
+<img src="https://miro.medium.com/max/3200/1*TmhYgSkBF7w10BbUokZoGQ.jpeg" style="
+position:absolute;
+top:1600px;
+width: 35%;
+height: 50%;
+left: 200px;
+opacity:100%"/>"
+</p>
+
+<p>
+<img src="https://miro.medium.com/max/2972/1*8donr4FykXZ9saPBVMlOxg.jpeg" style="
+position:absolute;
+top:1600px;
+width: 32%;
+height: 50%;
+left: 650px;
+opacity:100%"/>"
+</p>
+
+<p>
+<img src="https://miro.medium.com/max/1400/1*4xrpQ4AlyYcjV10UJjSKtw.png" style="
+position:absolute;
+top:3650px;
+width: 40%;
+height: 60%;
+left: 150px;
+opacity:100%"/>"
+</p>
+
+<p>
+<img src="https://miro.medium.com/max/1400/1*OhRgRdLnHzf3TNMEeLvHWw.png" style="
+position:absolute;
+top:4850px;
+width: 33%;
+height: 68%;
+left: 650px;
+opacity:100%"/>"
+</p>
+
+<p>
+<img src="https://miro.medium.com/max/1400/1*gmqtrhwOjM_XmkC4vXAlTA.jpeg" style="
+position:absolute;
+top:5650px;
+height: 70%;
+opacity:70%"/>"
+</p>
+
+
+<i  style="position:absolute;
+                    z-index: 1;
+                    left:530px;
+                    right:150px;
+                    top:1350px;
+                    line-height: 150%;
+                    color: #000000;
+                    font-family: 'helvetica', monospace;
+                    font-size: 15px;
+                    shape-margin: 5px;
+                    opacity: 70%;
+                    ">Beautiful NYC:Time Square</i>
+
+<i  style="position:absolute;
+          z-index: 1;
+          left:650px;
+          right:150px;
+          top:5250px;
+          line-height: 150%;
+          color: #000000;
+          font-family: 'helvetica', monospace;
+          font-size: 12px;
+          shape-margin: 5px;
+          opacity: 100%;
+          ">COVID Case Rate Map based on Zipcode (Red: Higher Case Rate, Green: Lower Case Rate)</i>
+
+
+<i  style="position:absolute;
+                    z-index: 1;
+                    left:500px;
+                    right:150px;
+                    top:1900px;
+                    line-height: 150%;
+                    color: #000000;
+                    font-family: 'helvetica', monospace;
+                    font-size: 15px;
+                    shape-margin: 5px;
+                    opacity: 70%;
+                   ">COVID in NYC: Stretcher and empty streets </i>
+
+<b  style="position:absolute;
+          z-index: 1;
+
+          left:80px;
+          top:200px;
+          color: #F5F5F5;
+          font-family: 'inherit', monospace;
+          font-size: 60px;
+          text-transform:uppercase;
+          ">How does COVID Impact on Restaurants in NYC?</b>
+
+
+<a  style="position:absolute;
+                    z-index: 1;
+                    left:150px;
+                    right:150px;
+                    top:700px;
+                    letter-spacing: 2px;
+                    line-height: 150%;
+                    color: #000000;
+                    font-family: 'helvetica', monospace;
+                    font-size: 20px;
+                    shape-margin: 5px;
+                    transition:  0.5s;
+                    ">NYC was always known as the city that never sleeps.</a>
+
+<a  style="position:absolute;
+                              z-index: 1;
+                              left:150px;
+                              right:150px;
+                              top:800px;
+                              letter-spacing: 2px;
+                              line-height: 150%;
+                              color: #000000;
+                              font-family: 'helvetica', monospace;
+                              font-size: 20px;
+                              shape-margin: 5px;
+                              transition:  0.5s;
+                              ">A beautiful, bustling metropolis, with circuitous highways, innumerable glittering skyscrapers and a constant sense of speed and movement. </a>
+
+<a  style="position:absolute;
+                                        z-index: 1;
+                                        left:150px;
+                                        right:150px;
+                                        top:900px;
+                                        letter-spacing: 2px;
+                                        line-height: 150%;
+                                        color: #000000;
+                                        font-family: 'helvetica', monospace;
+                                        font-size: 20px;
+                                        shape-margin: 5px;
+                                        transition:  0.5s;
+                                        ">Tourists throng in large numbers to this part of the world to witness and be part of this magical wonderland, be it by taking a selfie at the top floor of the empire state building or by strolling through Times Square while enjoying a slice of Joe’s. </a>
+
+<a  style="position:absolute;
+  z-index: 1;
+  left:150px;
+  right:150px;
+  top:1450px;
+  letter-spacing: 2px;
+  line-height: 150%;
+  color: #000000;
+  font-family: 'helvetica', monospace;
+  font-size: 20px;
+  shape-margin: 5px;
+  transition:  0.5s;
+  ">And then, COVID-19 happened... </a>
+
+<a  style="position:absolute;
+  z-index: 1;
+  left:150px;
+  right:150px;
+  top:1980px;
+  letter-spacing: 2px;
+  line-height: 150%;
+  color: #000000;
+  font-family: 'helvetica', monospace;
+  font-size: 20px;
+  shape-margin: 5px;
+  transition:  0.5s;
+  ">Death and despair were lurking all around us. We were stuck at home, with not much to do.
+  Jobs were at risk, money was tight, and in general,
+  we were constantly scared and anxious as there seemed to be no light at the end of the tunnel. </a>
+
+  <a  style="position:absolute;
+    z-index: 1;
+    left:150px;
+    right:150px;
+    top:2120px;
+    letter-spacing: 2px;
+    line-height: 150%;
+    color: #000000;
+    font-family: 'helvetica', monospace;
+    font-size: 20px;
+    shape-margin: 5px;
+    transition:  0.5s;
+    ">Now, ever wondered what happened to restaurants at this time? </a>
+
+    <a  style="position:absolute;
+      z-index: 1;
+      left:150px;
+      right:150px;
+      top:2200px;
+      letter-spacing: 2px;
+      line-height: 150%;
+      color: #000000;
+      font-family: 'helvetica', monospace;
+      font-size: 20px;
+      shape-margin: 5px;
+      transition:  0.5s;
+      ">COVID-19 has affected the restaurant industry harder than any other;
+      it will probably take months or even years to fully calculate the actual damage created.</a>
+
+      <a  style="position:absolute;
+        z-index: 1;
+        left:150px;
+        right:150px;
+        top:2320px;
+        letter-spacing: 2px;
+        line-height: 150%;
+        color: #000000;
+        font-family: 'helvetica', monospace;
+        font-size: 20px;
+        shape-margin: 5px;
+        transition:  0.5s;
+        ">Hundreds of restaurants have been closed permanently across New York due to a lack of governmental funding,
+        and a thousand more closures are yet to be assessed;
+        many small restaurants in Chinatown are continue to deal xenophobia-related issues;
+        restaurants in Midtown are reeling from record-low tourism;
+        and regardless of when “normalcy” mountains of unpaid debt await restaurateurs on the flip side.</a>
+
+        <a  style="position:absolute;
+          z-index: 1;
+          left:150px;
+          right:150px;
+          top:2540px;
+          letter-spacing: 2px;
+          line-height: 150%;
+          color: #000000;
+          font-family: 'helvetica', monospace;
+          font-size: 20px;
+          shape-margin: 5px;
+          transition:  0.5s;
+          ">Through the challenges, however, there have also been some welcome changes across zip codes.
+          While the quickly mushrooming outdoor dining spaces, take away cocktails and delivery platforms are more obvious,
+          the pandemic has ushered in a sense of health accountability to the restaurant world. Let us take a look at how:</a>
+      <a  style="position:absolute;
+            z-index: 1;
+            left:150px;
+            right:150px;
+            top:3200px;
+            letter-spacing: 2px;
+            line-height: 150%;
+            color: #000000;
+            font-family: 'helvetica', monospace;
+            font-size: 20px;
+            shape-margin: 5px;
+            transition:  0.5s;
+            ">So we took the restaurantinspection data from DOHMH (Department of Health and Mental Hygiene)
+            for 2019 to 2021 and its all ratings in chronological order, which is shown in the chart above.
+            In general, the higher the rating,
+            the more compliant the restaurant is with DOHMH regulations,
+            while restaurants below a certain rating will not be allowed to open (below grading D)</a>
+      <a  style="position:absolute;
+                  z-index: 1;
+                  left:150px;
+                  right:150px;
+                  top:3400px;
+                  letter-spacing: 2px;
+                  line-height: 150%;
+                  color: #000000;
+                  font-family: 'helvetica', monospace;
+                  font-size: 20px;
+                  shape-margin: 5px;
+                  transition:  0.5s;
+                  ">From the results, New York's restaurants show a gradual increase in ratings,
+                  i.e. the ratings are generally low in 2019,
+                  but the frequency of highly rated restaurants starts to
+                  increase as we enter the COVID period of 2020 and 2021.</a>
+          <a  style="position:absolute;
+                              z-index: 1;
+                              left:150px;
+                              right:150px;
+                              top:3550px;
+                              letter-spacing: 2px;
+                              line-height: 150%;
+                              color: #000000;
+                              font-family: 'helvetica', monospace;
+                              font-size: 20px;
+                              shape-margin: 5px;
+                              transition:  0.5s;
+                              ">However, it is interesting to note that
+                              the number of inspestion restaurants is declining.</a>
+
+
+ <a  style="position:absolute;
+                     z-index: 1;
+                     left:150px;
+                     right:150px;
+                     top:5350px;
+                     letter-spacing: 2px;
+                     line-height: 150%;
+                     color: #000000;
+                     font-family: 'helvetica', monospace;
+                     font-size: 20px;
+                     shape-margin: 5px;
+                     transition:  0.5s;
+                     "> It took a once-in-a-lifetime, deadly pandemic to teach us some important life lessons,
+                     leading up to these much needed changes.
+                     Let us endeavor to make these changes our new normal,
+                     rather than wait for the next pandemic to get our adrenaline rushing again.</a>
+
+<a  style="position:absolute;
+                    z-index: 1;
+                    left:150px;
+                    right:150px;
+                    top:5500px;
+                    letter-spacing: 2px;
+                    line-height: 150%;
+                    color: #000000;
+                    font-family: 'helvetica', monospace;
+                    font-size: 20px;
+                    shape-margin: 5px;
+                    transition:  0.5s;
+                    ">And take care.</a>
+
+<i  style="position:absolute;
+       z-index: 1;
+       left:150px;
+       right:150px;
+       top:5600px;
+       letter-spacing: 1px;
+       line-height: 150%;
+       color: #000000;
+       font-family: 'helvetica', monospace;
+       font-size: 12px;
+       shape-margin: 5px;
+       transition:  0.5s;
+      ">Presented by Dhruva Lakshminarayanan & Yixuan Ouyang.</i>
+
+         <i  style="position:absolute;
+                z-index: 1;
+                left:680px;
+                right:150px;
+                top:3680px;
+                letter-spacing: 1px;
+                line-height: 150%;
+                color: #000000;
+                font-family: 'helvetica', monospace;
+                font-size: 15px;
+                shape-margin: 5px;
+                transition:  0.5s;
+               ">As seen in the graph on the left, overall,
+                the number of all restaurant inspects plummeted from 141,651 in 2019 to 18,318 in 2021,
+                a decrease of 87.06%, indicating that a number of restaurants may have closed due to
+                (1) the pandemic and (2) that they were unable to meet DOHMH regulations during the outbreak.
+                In terms of cuisine, all cuisines showed a downward trend,
+                with the largest number of American and Chinese cuisines being the most typical.
+                You can see the detail secores in the charts below.</i>
+
+  <a  style="position:absolute;
+                                    z-index: 1;
+                                    left:150px;
+                                    right:150px;
+                                    top:4650px;
+                                    letter-spacing: 2px;
+                                    line-height: 150%;
+                                    color: #000000;
+                                    font-family: 'helvetica', monospace;
+                                    font-size: 20px;
+                                    shape-margin: 5px;
+                                    transition:  0.5s;
+                                    ">So does a restaurant's rating in terms of location correlate with COVID?
+                                    The following graph intercepts the distribution of American cuisine
+                                    and the number of COVID cases (zipcode level).
+                                    You can clearly see that lower Manhattan has a higher post-epidemic rating,
+                                    while other areas are still dominated by restaurants with low ratings.</a>
+
+  <i  style="position:absolute;
+        z-index: 1;
+        left:200px;
+        right:150px;
+        top:5250px;
+        letter-spacing: 1px;
+        line-height: 150%;
+        color: #000000;
+        font-family: 'helvetica', monospace;
+        font-size: 12px;
+        shape-margin: 5px;
+        transition:  0.5s;
+        ">restaurant inspection records before and after COVID</i>
+  <i  style="position:absolute;
+              z-index: 1;
+              left:200px;
+              right:150px;
+              top:5265px;
+              letter-spacing: 1px;
+              line-height: 150%;
+              color: #000000;
+              font-family: 'helvetica', monospace;
+              font-size: 12px;
+              shape-margin: 5px;
+              transition:  0.5s;
+              ">(April 2020 as the breaking point)</i>
+
+
+<script type="text/javascript">
+                  var cuisine = []
+                  var years = [2019, 2020, 2021]
+
+                  Promise.all([d3.csv("2021.csv")])
+                  .then(function(data){
+                    var formattedByCuisine = groupByCuisine(data[0])
+                    console.log(formattedByCuisine)
+                    var cuisineTypes = Object.keys(formattedByCuisine).sort()
+                    for(var c in cuisineTypes){
+                      d3.select("#buttons2021").append("div")
+                      .html(cuisineTypes[c])
+                      .attr("id",cuisineTypes[c])
+                      .on("click",function(){
+                        var cuisineKey = d3.select(this).attr("id")
+                        var cuisineData = formattedByCuisine[cuisineKey]
+                        drawCuisineChart(cuisineData)
+                      })
+                    }
+                  })
+                  function groupByCuisine(data){
+                    var cDictionary ={}
+                    for(var i in data){
+                      var cuisine = data[i]["CUISINE DESCRIPTION"]
+                      if(Object.keys(cDictionary).indexOf(cuisine)==-1){
+                        cDictionary[cuisine]=[]
+                        cDictionary[cuisine].push(data[i])
+                      }else{
+                        cDictionary[cuisine].push(data[i])
+                      }
+                    }
+                    return cDictionary
+                  }
+                  function drawCuisineChart(cuisineData){
+                    d3.select("#chart2021 svg").remove()
+                    var w = 500;
+                    var h = 500;
+                    var padding = 40;
+                    var parseTime = d3.timeParse("%m/%d/%Y");
+                    var svg = d3.select("#chart2021")
+                              .append("svg")
+                              .attr("width", w)
+                              .attr("height", h);
+                    xScale = d3.scaleTime()
+                             .domain([
+                              d3.min(cuisineData, function(d) { return parseTime(d["INSPECTION DATE"]); }),
+                              d3.max(cuisineData, function(d) { return parseTime(d["INSPECTION DATE"]); })
+                            ])
+                             .range([padding, w - padding]);
+
+                    yScale = d3.scaleLinear()
+                             .domain([
+                              d3.min(cuisineData, function(d) { return d["SCORE"]; }),
+                              d3.max(cuisineData, function(d) { return d["SCORE"]; })
+                            ])
+                             .range([h - padding, padding]);
+                             xAxis = d3.axisBottom()
+                                       .scale(xScale)
+                                       .ticks(8);
+                             yAxis = d3.axisLeft()
+                                       .scale(yScale)
+                                       .ticks(15);
+                  svg.append("g")
+                    .attr("class", "axis")
+                    .attr("transform", "translate(0," + (h - padding) + ")")
+                    .call(xAxis);
+                  svg.append("g")
+                    .attr("class", "axis")
+                    .attr("transform", "translate(" + padding + ",0)")
+                    .call(yAxis);
+                    svg.selectAll("circle")
+                       .data(cuisineData)
+                       .enter()
+                       .append("circle")
+                       .attr("cx", function(d) {
+                          return xScale(parseTime(d["INSPECTION DATE"]));
+                       })
+                       .attr("cy", function(d) {
+                          return yScale(d["SCORE"]);
+                       })
+                       .attr("r", 2);
+                  }
+</script>
+<script type="text/javascript">
+                  var dataset = null
+                  function updateColumn(column){
+                      d3.selectAll("rect")
+                      .each(function(d,i){
+                          d3.select(this)
+                          .transition()
+                          .duration(1000)
+                          .delay(i*10)
+                          .attr("y",function(){
+                              return h - (d[column] * 4);
+                          })
+                          .attr("height",function(){
+                              return d[column] * 4;
+                          })
+                      })
+                  }
+            var w = 25000;
+            var h = 400;
+            var barPadding = 1;
+            var svg = d3.select("#chart")
+                  .append("svg")
+                  .attr("width", w)
+                  .attr("height", h);
+                 d3.csv("Subset_Draft2.1.csv")
+                      .then(function(data) {
+                          dataset = data
+                           svg.selectAll("rect")
+                       .data(data)
+                       .enter()
+                       .append("rect")
+                       .attr("x", function(d, i) {
+                          return i * (w / data.length);
+                       })
+                       .attr("y", function(data) {
+                          return h - (data.Year2019 * 4);
+                       })
+                       .attr("width", w / data.length - barPadding)
+                       .attr("height", function(data) {
+                          return data.Year2019 * 4;
+                       })
+                       .attr("fill", "teal");
+
+                     } )
+
+                   </script>
+
+                   <script>
+                  var bounds = [
+                  [-74.2484, 40.5092],
+                  [-73.7027, 40.9065]
+                  ];
+mapboxgl.accessToken = 'pk.eyJ1IjoianVsaXVzLXJ1c3NlbGwiLCJhIjoiY2t2OXM1bnB3YTZ5MzJvbno4dDNnN3RkayJ9.gog6DPxXz8pF5-pc4kgqZw';
+var map = new mapboxgl.Map({
+container: 'map',//this is the div that you have mad above in html that you are now placing your map in
+style: 'mapbox://styles/julius-russell/ckvv4pogx3mi514q7yf3nhu8m',//you will find the accessToken under "Share" in your specific map in mapbox studio
+center: [-73.982, 40.738],//the center of the map can be set to any initial value of [lng,lat]
+zoom: 9 ,//note that some layers have zoom limits - for example, streets and building footprints are not visible when zoomed out
+maxBounds: bounds // Sets bounds as max
+});
+
+  map.addControl(new mapboxgl.NavigationControl());
+  map.on('load',function(){
+  map.addSource('American_AfterCOVID', {
+                      type: 'vector',
+                      url: 'mapbox://julius-russell.ckwv26cxa7sb927mr96piqkmh-2yon9'
+                    });
+  map.addLayer({
+                      'id': 'American_AfterCOVID',
+                      'type': 'circle',
+                      'source': 'American_AfterCOVID',
+                      'layout': {
+                    'visibility': 'visible'
+                    },
+                    'paint': {
+                    'circle-radius': 1,
+                    'circle-color': 'rgba(63,60,211,1)'
+                    },
+                    'source-layer': 'American_AfterCOVID'
+                    });
+  map.addSource('American_BeforeCOVID_P1', {
+                      type: 'vector',
+                      url: 'mapbox://julius-russell.ckwv273832ezo20mk6kgzwsv3-8nk30'
+                    });
+                    map.addLayer({
+                      'id': 'American_BeforeCOVID',
+                      'type': 'circle',
+                      'source': 'American_BeforeCOVID_P1',
+                      'layout': {'visibility': 'visible'},
+                      'paint': {'circle-radius': 1,
+                      'circle-color': 'rgba(63,60,211,1)'
+                      },
+                      'source-layer': 'American_BeforeCOVID_P1'
+                      });
+                    var toggleableLayerIds = ['American_BeforeCOVID', 'American_AfterCOVID'];
+                    for (var i = 0; i < toggleableLayerIds.length; i++) {
+                      var id = toggleableLayerIds[i];
+                    console.log(id)
+                      var link = document.createElement('a');
+                      link.href = '#';
+                      link.className = 'active';
+                      link.textContent = id;
+                      link.onclick = function (e) {
+                        var clickedLayer = this.textContent;
+                        e.preventDefault();
+                        e.stopPropagation();
+                        var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+                        if (visibility === 'visible') {
+                        map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+                        this.className = '';
+                      } else {
+                        this.className = 'active';
+                        map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+                      }
+                      }
+                      var layers = document.getElementById('menu');
+                      layers.appendChild(link);
+                    }
+                        map.on('mouseenter', 'places', function () {
+                        map.getCanvas().style.cursor = 'pointer';
+                        });
+                        map.on('mouseleave', 'places', function () {
+                        map.getCanvas().style.cursor = '';
+                        });
+                    });
+                        function flyTo(mouseData){
+                        console.log(mouseData)
+                        var lat = mouseData.lngLat.lat
+                        var lng = mouseData.lngLat.lng
+
+                        console.log([lat,lng])
+                                  map.flyTo({
+                            center: [lng,lat],
+                                zoom:14
+                            });}
+
+    </script>
+  </body>
+</html>

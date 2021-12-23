@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="../favicon.icon" rel="shortcut icon" type="image/x-icon" />
+    <title>The Beauty of Street trees</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
+    <script src="lib/d3.v5.min.js"></script>
+    <link rel="stylesheet" href="lib/w3style.css">
+</head>
+<body>
+
+    <div id="container" style="height: 100vh; overflow: scroll">
+      <div id="content">
+        <div class="w3-display-middle">
+        <div class="panel">
+            <h1><b>Explore the Beauty of Street trees</b></h1>
+              <form class="w3-container w3-pale-green w3-round-large">
+                  <label class="w3-text-orange w3-center"><b>Your Name</b></label>
+                  <input id="NAME" class="w3-input w3-border w3-round w3-animate-input w3-center" type="text">
+                  <div><h1> </h1></div>
+
+                  <label class="w3-text-orange"><b>Zip Code</b></label>
+                  <input id="zipCode" class="w3-input w3-border w3-round-large w3-animate-input w3-center" type="text">
+                  <div><h1> </h1></div>
+
+                  <button type="button"
+                  class="w3-btn w3-orange w3-center w3-hover-teal"><a href=1pagenew.html><b>Start</b></a> </button>
+                  <div><h1> </h1></div>
+
+                  <button type="button" id="register"
+                  class="w3-btn w3-pale-green w3-center w3-hover-teal">Start with earlier version </button>
+                  <div><h1> </h1></div>
+              </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+</body>
+<script>
+  (function () {
+    const redirectButton = document.getElementById('register');
+
+    redirectButton.addEventListener('click', () => {
+      const id = document.getElementById('zipCode');
+      window.location.href = '1page.html?id='+id.value;
+    });
+
+  })();
+</script>
+</html>

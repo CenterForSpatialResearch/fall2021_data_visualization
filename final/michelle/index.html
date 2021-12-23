@@ -1,0 +1,203 @@
+<!doctype html>
+<html>
+    <head>
+        <!--demonstration of using the svg 'use' element to create a pictogram-->
+		<script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+		<link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+		<script src="https://d3js.org/d3.v4.min.js"></script>
+		<script src="https://d3js.org/d3.v4.js"></script>
+		<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css" />
+        <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+        <script src="//cdn.jsdelivr.net/jquery.ui.touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+        <style type="text/css">
+			
+            
+			
+	        #map {
+	            height: 90vh;
+	            width:80vw;
+				margin:100px;
+				justify-content: center;
+	            /*z-index: -5;
+*/position:absolute;
+				/*border:1px solid black;*/
+				/*padding:50px;*/
+	        }
+			
+            #chrysler svg {
+                overflow:none;
+             
+                float:left;
+                width:800px;
+                height:1350px;
+            }
+            #cars svg {
+                overflow:none;
+                padding:10px;
+                float:left;
+                width:800px;
+                height:1350px;
+            }
+
+
+			#part1{
+				display:block;
+				margin:auto;
+				width:100%;
+			}
+           
+            #part0{
+				
+/*				border:1px solid red;
+*/                height:1000px;
+            }
+            .iconPlain  {
+                fill:#bfd4db;   
+            }
+            
+            .iconSelected  {
+                fill:#daa520;   
+            }
+            
+			#title{
+				text-align: center;
+				font-family: "Montserrat";
+			}
+			#cars{width:50%; 
+				position:absolute;
+				right:0px;
+				display:inline-block;
+				margin:auto;}
+			#chrysler{width:50%;
+				position:relative;
+				left:100px;
+				display:inline-block;
+				margin:auto;
+			}
+			.mainText{
+				font-size:24px;
+				color:white;
+				text-align: center;
+				font-family: "Montserrat";
+			}
+			
+			
+			#tooltip{
+				position:fixed;
+				z-index:999;
+			}
+			
+			
+			#image {
+				position:relative;
+				width:100%;
+				height: auto;
+				margin-bottom: 25px;
+			}
+			
+			img{width:100%;}
+			
+			
+			.centered {
+			  position: absolute;
+			  top: 50%;
+			  left: 50%;
+			  transform: translate(-50%, -50%);
+			  font-family: "Montserrat";
+			  font-size:40px;
+			  color:white;
+			  text-align: center;
+			}
+			
+			.legend {
+			background-color: #fff;
+			border-radius: 3px;
+			top: 4100px;
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+			font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+			padding: 10px;
+			position: absolute;
+			right: 20px;
+			z-index: 1;
+			}
+ 
+			.legend h4 {
+			margin: 0 0 10px;
+			}
+ 
+			.legend div span {
+			border-radius: 50%;
+			display: inline-block;
+			height: 10px;
+			margin-right: 5px;
+			width: 10px;
+			}
+        </style>
+	</head>
+	
+	<body>
+		<body style="background-color:#404040;">
+		
+		<div id = "image">
+			<img src="http://res.cloudinary.com/simpleview/image/upload/v1589370477/clients/newyorkcity/NYC_and_Company_Coalition_3000x2000_01252e2c-3d05-4728-8a2b-0a392d27b821.jpg">
+			<div class="centered" class="title"><b>Building Energy Consumption in New York City</b></div>
+		</div>
+		
+		<div id="text0" class="mainText">Buildings, residential and commercial, account for nearly 40% of total energy consumption.
+			<p>As the most populous city in the United States, New York City is home to the highest building square footage. Posing a challenge to climate change mitigation, buildings emit two-thirds of New York's greenhouse gases by way of energy consumption from lighting, appliances, heat, and hot water, according to the NYC Urban Green Council. Over the past several years, New York City has enacted several policy measures in an effort to mobilize the city's decarbonization efforts - most notably Local Law 97, passed in 2019 as a part of New York City's Green New Deal to dramatically reduce emissions created by the city's largest buildings (>25,000 square feet) by 40% by 2030 and 80% by 2050 (80X50).
+		</p>
+		<p>Opportunity for improved building efficiency are enormous.</p>
+		<p>NYC has more than 1 MILLION buildings.<BR>That's more than 1 MILLION opportunities to reduce-energy consumption.<p>
+		</div>
+		
+		<div id="text00" class="mainText">Here's <BR> New York City's Iconic Chrysler Building 
+		</div>
+			
+		<div id="chrysler">
+		</div>
+		
+		<div id="cars"></div>
+			
+		
+		<div id="text1" class="mainText">
+			<h2> Chrysler Building</h2>
+		<p> 405 Lexington AVE, Manhattan, NY 10174<BR> Primary Use: Office<BR>Year Built: 1930 </p>The Chrysler Building consumes 53,247,624.7 kBTU annually.<BR>This is equivalent to the annual energy consumption of <BR>930 average fuel cars.
+			<p>Chrysler Building's source EUI is 114.8 kBtu per square feet.</p>
+		</div>
+		
+		<div id="textEUI" class="mainText">
+			<p><BR><BR>Energy Usage Intensity is the annual energy usage per square foot of each building.</p>
+			<p>Here's how much energy New York City's buildings consume annually</p>
+		</div>
+		
+		<div id="part1"></div>
+		
+		
+		<div id="map">Map</div>
+		<div id="tooltip">tooltip</div>
+		
+		<div id="state-legend" class="legend">
+		<h4>Year Built</h4>
+		<div><span style="background-color: #4150f1"></span>2000-2021</div>
+		<div><span style="background-color: #6a55f1"></span>1980-2000</div>
+		<div><span style="background-color: #895ff1"></span>1960-1980</div>
+		<div><span style="background-color: #a46af1"></span>1940-1960</div>
+		<div><span style="background-color: #bb74f1"></span>1900-1940</div>
+		<div><span style="background-color: #d07bef"></span>1800-1900</div>
+		<div><span style="background-color: #e784f0"></span>Before 1800</div>
+		</div>
+		
+		
+		
+		<script src="Chryslerfinal.js"></script>
+		<script src="cars.js"></script>
+		<script src="buildingfinal.js"></script>
+		<script src="mapbox1.js"></script>
+		
+		
+		
+	</body>
+	</html>
+		

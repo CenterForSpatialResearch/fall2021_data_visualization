@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>introduction bar 2</title>
+		<script type="text/javascript" src="../d3.js"></script>
+        <!-- <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.0.0/d3.min.js"></script> -->
+		<style type="text/css">
+			/* No style rules here yet */		
+		</style>
+	</head>
+
+	<body>
+		<button>how much is wilderness?</button>
+        <script type="text/javascript">
+
+        //loading data
+		Promise.all([d3.csv("fed-wild.csv")])
+		.then(function(data){	
+			drawBar2(data[0])
+		})
+
+
+		function drawBar2(dataset){
+            // chart width and height
+			var w = 1000;
+			var h = 300;
+			var barPadding = 5
+			var margin = 200
+			var xMargin = 40
+			
+			var dataset; 
+
+			var colors = [
+			"#c48b3a",  //BLM
+            "#927c41",  //FS
+            "#9d6b42",  //FWS
+            "#bc422a",  //NPS
+            "#f2d59a",  //DOD
+        	]
+            
+			var xScale = d3.scaleLinear()
+                .domain([
+                0
+                ,
+                d3.max(dataset, function(d){return parseInt(d.Wilderness_Acres);})
+                ])
+                // .domain([0,45000000])
+				.range([0,w - xMargin * 2])
+
+			var xAxis = d3.axisBottom()
+				.scale(xScale)
+				.ticks(10)
+			
+                
+			// SVG element
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h+xMargin);
+
+			// create bars			
+			svg.selectAll("rect")
+			   .data(dataset)
+			   .enter()
+			   .append("rect")
+			   .attr("y", function(d, i) {
+				   return i * (h / dataset.length)
+			   })
+			   .attr("x", function(d) {
+			   		return 0
+			   })
+			   .attr("height", h / dataset.length - barPadding)
+			   .attr("width", function(d) {
+			   		return xScale(d.Wilderness_Acres)
+			   })
+			   .attr("fill", function(d, i){
+				   return colors[i]
+			   })
+
+			svg.selectAll("labels")
+			   .data(dataset)
+			   .enter()
+			   .append("text")
+			   .text(function(d){
+				   return d.Agency;
+			   })
+			   .attr("y", function(d, i) {
+				   return (i * (h / dataset.length)) +28 // HOW DO I CENTER TEXT IN MIDDLE OF BAR?
+			   })
+				.attr("x", 10)
+			   	.attr("text-anchor", "start")
+                .attr("fill", "white")
+				
+            d3.select("button")
+               .on("click", function(){
+
+                dataset = [234413355, 156229834, 68497291, 35562593, 8800000]
+
+                svg.selectAll("rect")
+                    .data(dataset)
+                    .attr("x",function(d) {
+                        return w - xScale(d);
+                    })
+                    .attr("width", function(d){
+                        return xScale(d);
+                    })
+                    .attr("fill", function(d,i){
+                        return colors[i]
+                    })
+               })
+
+			// xAXIS
+			svg.append("g")
+			   .attr("class", "axis")
+               .attr("transform", "translate(0," + (h-xMargin) + ")")
+			   .call(xAxis)
+
+		}
+        </script>
+	</body>
+</html>

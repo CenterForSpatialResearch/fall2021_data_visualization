@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>introduction bar 2</title>
+		<script type="text/javascript" src="../d3.js"></script>
+		<style type="text/css">
+			/* No style rules here yet */		
+		</style>
+	</head>
+
+	<body>
+		<script type="text/javascript">
+
+		// chart width and height
+		var w = 800;
+		var h = 300;
+		var barPadding = 5;
+		var margin = 200
+
+		var dataset; 
+
+		var colors = [
+		"#c48b3a",  //BLM
+		"#927c41",  //FS
+		"#9d6b42",  //FWS
+		"#bc422a",  //NPS
+		"#f2d59a",  //DOD
+		]
+
+		//loading data
+		Promise.all([d3.csv("fed-wild.csv")])
+		.then(function(data){	
+		drawBar2(data[0])
+		})
+
+
+		function drawBar2(dataset){
+
+		// List of subgroups = header of the csv files 
+		var subgroups = data.columns.slice(1)
+
+		// List of groups -- on X axis
+		var groups = d3.map(data, function(d){return(d.group)}).keys()
+
+		// Y Axis
+		var y = d3.scaleBand()
+			.domain(groups)
+			.range([0, h])
+			.padding([0.2])
+  		svg.append("g")
+			.attr("transform", "translate(0," + h + ")")
+			.call(d3.axisLeft(y).tickSizeOuter(0));
+
+  		// Add X axis
+  		var x = d3.scaleLinear()
+			.domain([0, 60])
+			.range([ w, 0 ]);
+  		svg.append("g")
+    		.call(d3.axisBottom(x));
+
+		var stackedData = d3.stack()
+			.keys(subgroups)
+			(data)
+
+		// SVG element
+		var svg = d3.select("body")
+					.append("svg")
+					.attr("width", w)
+					.attr("height", h);
+
+		// create bars			
+		svg.selectAll("rect")
+		.data(stackedData)
+		.enter()
+		.append("rect")
+
+		.selectAll("rect")
+		.data(function(d){
+			return d;
+		})
+		.enter()
+		.append("rect")
+
+		.attr("y", function(d) {
+			return y(d.data.group)
+		})
+		.attr("x", function(d) {
+				return x(d[1]);
+		})
+		.attr("height", function(d){
+			return x(d[0])-x(d[1]);
+		})
+		.attr("width", x.bandwidth())
+		.attr("fill", function(d, i){
+			return colors[i]
+		})
+
+
+		// svg.selectAll("labels")
+		// .data(dataset)
+		// .enter()
+		// .append("text")
+		// .text(function(d){
+		// 	return d.Agency;
+		// })
+		// .attr("y", function(d, i) {
+		// 	return (i * (h / dataset.length)) +28 // HOW DO I CENTER TEXT IN MIDDLE OF BAR?
+		// })
+		// 	.attr("x", margin - 10)
+		// 	.attr("text-anchor", "end")
+
+
+		}
+
+        </script>
+	</body>
+</html>

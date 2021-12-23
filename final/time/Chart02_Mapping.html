@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+<head>
+     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <title>basic basemap</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script type="text/javascript" src="../d3.js"></script>
+	<style type="text/css">
+		body{text-align:center;
+		}
+		
+		p.closer {
+			 line-height: 1;}
+ 		p.further {
+ 			 line-height: 1.3;
+ 			 text-align:left
+ 		}
+	
+		#tooltip1 {
+			position: absolute;
+			width: 120px;
+			height: auto;
+			padding: 10px;
+			background-color: rgba(255, 255, 255, 0.8);
+			-webkit-border-radius: 5px;
+			-moz-border-radius: 5px;
+			border-radius: 5px;
+			-webkit-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); 
+			-moz-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); 
+			box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); 
+			pointer-events: none;			
+		}
+		
+		#tooltip1.hidden {
+			display: none;
+		}
+		
+		
+		#pie {
+			position:relative;
+		}
+		
+		#tooltip2 {
+			position: absolute;
+			  top: 325px;
+			  right: 0;
+			  width: 200px;
+			  height: 100px;
+		}
+		
+		#tooltip2.center {
+		  position: relative;
+		  width: 200px;
+		  height: 100px;
+		  text-align: center;
+		}
+		
+		#tooltip2.hidden {
+			display: none;
+		}
+		
+		#tooltip2 p {
+			margin: 0;
+			font-family: sans-serif; 
+			font-size: 10px;
+		}
+		
+		#buttonTotal {
+		width: 300px;
+		height: auto;
+		padding: 6px;
+		background-color: rgba(255, 255, 255, 1);
+		border-width: 1px;
+		border-color: black;
+		border-style: solid;
+		margin: 0;
+		font-family: Times New Roman; 
+		font-size: 12px;
+		line-height: 12px; 
+		}
+		
+		#buttonHome, #button1, #button3 {
+		width: 160px;
+		height: auto;
+		padding: 6px;
+		background-color: rgba(0, 0, 0, 1);
+
+		margin: 20;
+		font-family: Times New Roman; 
+		font-size: 14px;
+		line-height: 14px;
+		color: white; 
+		}
+		
+		a:link {
+		  color: white;
+		}
+		
+		a:visited {
+		  color: white;
+		}
+		
+		a:hover {
+		  color: red;
+		}
+		
+		.displayInline{
+			display:inline-block;
+		}
+			
+			
+	</style>
+
+</head>
+<body>
+	<div><strong><p style="font-size: 18px; font-family: Times New Roman;" class="closer"> Where Do These Featured People Come From? </p ></strong>
+			<p style="font-size: 12px; font-family: sans-serif;padding-left: 15%; padding-right: 15%;"  class="further"> An American-centric perspective leads us to think most people featured would be Americans, right? Yes. In fact, 78%. The runner up is the United Kingdom, at just under 4%. After that, many countries contributed just a scattering of people (less than 1% each) to grace the covers. </p >
+	</div>
+			
+			
+	<div id="buttonTotal" class="displayInline" style="margin-left:10px; margin-right:10px"><strong>Click Here to View the Overall Map of Nationality</strong></div><br/>
+	
+	<div id="map" class="displayInline"></div>
+	<div id="pie" class="displayInline">
+		<div id="tooltip2" class="hidden">
+			<p><span id="Occupation">100</span></p>
+		</div>
+	</div>
+	
+	
+		<div id="tooltip1" class="hidden" style="font-size: 10px; font-family: sans-serif">
+		</div>
+		
+		
+		<br/>
+		
+		<div id="buttonHome" class="displayInline" style="margin:30px"><a href="HomePage.html"><strong>Home</strong></a ></div>
+		<div id="button1" class="displayInline" style="margin:30px"><a href="Chart01_Bars.html"><strong>Everyone</strong></a ></div>
+		<div id="button3" class="displayInline" style="margin:30px"><a href="Chart03_heads.html"><strong>The TIME 3-timer club</a ></strong></div><br/>
+			
+		<div> 
+		   <p style="font-size: 10px; font-family: sans-serif; padding-left: 12%; padding-right: 12%; padding-top: 85px" > Dataset: https://time.com/vault/ <br /> Produced by: Kenney Zhou, Rongxin Tang, Shuhua Li <br /> Data Visualization Final Project <br /> DEC. 2021
+           </p><br />
+		   <img src="gsapplogo.png" style="height:50px;">
+	    </div>
+		
+		<script type="text/javascript"> 
+			
+			
+        var width = 960// window.innerWidth
+        var height = 700//window.innerHeight
+
+        var svg = d3.select("#map")
+			.append("svg").attr("width",width)
+			.attr("height", height)    
+			      
+
+        var geoPath = "countries.geojson";
+        var dataPath = "timecovers_final.csv";
+		var centroidsPath = "centroids.csv"
+var byOccupation = {}
+var geo
+var places
+var centroids
+var colors = d3.scaleOrdinal()
+    .domain(["Arts_Entertainment", "Business", "Journalism", "Politics_Gov", "Religion", "Science", "Social_Issues", "Sports"])
+    .range(["#f47a7f", "#ffd24b", "#ce4e58", "#006896", "#b6b6b6", "#9180d6", "#f7941e", "#91d9d2"]);
+
+        Promise.all([d3.json(geoPath), d3.csv(dataPath),d3.csv(centroidsPath)]).then(function(data) {
+                geo = data[0];
+                 places = data[1];
+				centroids = data[2]
+                drawOutline(geo)
+				
+               drawDots(places,geo,centroids)
+				
+			   var byOccupation = {}
+                for(var p in places){
+                  var Country = places[p]["Occupation"]                
+                  var currentKeys = Object.keys(byOccupation)
+                
+  				  if(currentKeys.indexOf(Country)==-1){
+  					  byOccupation[Country]=[]
+  					  byOccupation[Country].push(places[p])
+                  }else{
+  					byOccupation[Country].push(places[p])
+                  }
+                }
+  			// console.log(byOccupation)
+			  
+            });
+            
+			
+			
+			
+            function drawOutline(geo){
+                var padding = 20
+                var Projection = d3.geoMercator()
+				.rotate([-11, 0])
+                .scale(960/Math.PI/2)  
+                .translate([480,480])
+
+               
+			    var path = d3.geoPath().projection(Projection);
+               
+			    svg.append("path")
+                    .attr("d", path(geo))
+                    .attr("fill", "#e5e5e5")
+                    .attr("stroke", "white")
+                    .attr("stroke-width",.6)
+            };
+            
+            
+			
+            function drawDots(places,geo,centroids){        
+			//	console.log(centroids)  
+			//	console.log(geo)  
+				//console.log(places)  
+                var padding = 20
+                var projection = d3.geoMercator()
+				.rotate([-11, 0])
+                .scale(960/Math.PI/2)  
+                .translate([480,480])
+
+                       
+              var countryDictionary = {}
+              var countryCoordinates = {}
+  			byOccupation = {}
+
+			  var centroidsDictionary = {}
+			  for(var c in centroids){
+				  if(centroids[c]["ADMIN"]!=undefined){
+				  var countryName = centroids[c]["ADMIN"].split(" ").join("_")
+				  	//console.log(centroids[c])
+					  centroidsDictionary[countryName]=[centroids[c]["Latitude"], centroids[c]["Longitude"]]
+				  }
+			  }
+			  			  
+					// console.log(centroidsDictionary)
+			  
+              for(var p in places){
+                var Country = places[p]["Nationality"]                
+                var currentKeys = Object.keys(countryDictionary)
+                
+				  if(currentKeys.indexOf(Country)==-1){
+	                 countryDictionary[Country]=1
+                }else{
+                  countryDictionary[Country]+=1
+                }
+              }
+			  console.log(countryDictionary)
+			  
+			 
+			  
+            for(var p in places){
+                var Country = places[p]["Occupation"]                
+                var currentKeys = Object.keys(byOccupation)
+                
+				 if(currentKeys.indexOf(Country)==-1){
+					 byOccupation[Country]=[]
+					  byOccupation[Country].push(places[p])
+						countryCoordinates[Country]=[places[p]["Latitude"],places[p]["Longitude"]]
+					}else{
+				byOccupation[Country].push(places[p])
+                }
+              }
+		 //console.log(byOccupation)
+			  
+			  
+			  
+			var byOByC = {}
+			for(var co in byOccupation){
+				  byOByC[co]={}
+				var allCountries = byOccupation[co]
+				 for(ac in allCountries){
+				var nationality = allCountries[ac]["Nationality"]
+			    var existingNationalities = Object.keys(byOByC[co])
+					 if(existingNationalities.indexOf(nationality)==-1){
+					  	byOByC[co][nationality]=[]
+						 byOByC[co][nationality].push(allCountries[ac]) 
+					  }else{
+						 byOByC[co][nationality].push(allCountries[ac]) 
+					  }
+				  }
+			 }
+			//console.log(byOByC)
+			  
+			  
+			  var dataForDots = Object.keys(countryDictionary)
+			  
+			  var rScale = d3.scaleLinear().domain([1,754]).range([3,180])     
+                svg.selectAll("circle")
+                	.data(dataForDots)
+                    .enter()
+                	.append("circle")
+                	.attr("r", function(d){
+						//console.log(countryDictionary[d])
+                	    return rScale(countryDictionary[d])
+                	})
+                	.attr("cx", function(d) {
+						var fd = d.split(" ").join("_")
+						if(centroidsDictionary[fd]!=undefined){
+                  	   	return projection([centroidsDictionary[fd][1],centroidsDictionary[fd][0]])[0]
+						}else{
+						//console.log(d)
+						}
+                	})
+                	.attr("cy", function(d) {
+						var fd = d.split(" ").join("_")
+						if(centroidsDictionary[fd]!=undefined){
+						return projection([centroidsDictionary[fd][1],centroidsDictionary[fd][0]])[1]
+						}
+                	})
+					.attr("fill","red")
+					   //.transition()
+					   //.duration(800)
+					   //.ease(d3.easeCircleIn)
+					.attr("opacity", 0.8)
+                    .on("mouseover",function(d,i){
+                        d3.select(this).style("opacity",1);
+                     
+					 //var xPosition = event.clientX;
+       				 //var yPosition = event.clientY;
+	
+					
+					var xPosition = parseFloat(d3.select(this).attr("cx")) + 60;
+					var yPosition = parseFloat(d3.select(this).attr("cy")) + 70;
+
+					//Update the tooltip position and value
+					d3.select("#tooltip1")
+						.style("left", xPosition + "px")
+						.style("top", yPosition  + "px")			
+					    .html(dataForDots[i]+": "+countryDictionary[d]);
+								   
+						 console.log(countryDictionary[d])
+					
+					d3.select("#tooltip1").classed("hidden", false);   
+                    })
+					
+                    .on("mouseout",function(d,i){
+                        d3.select(this).style("opacity",0.8);
+				        d3.select("#tooltip1").classed("hidden", true);
+            
+                    });
+
+
+					
+			   
+            };
+			
+			
+			
+			
+			
+			
+			
+			
+		    var w =250
+            var h = 700
+	       
+	        d3.csv("Time_Cover_Occupation.csv")
+	        .then(function(data){
+
+				var w = 200;
+				var h = 600;
+				var padding = 60;
+			
+			var svg = d3.select("#pie").append("svg").attr("width",w).attr("height",h)
+				
+            var colors = d3.scaleOrdinal()
+			    .domain(["Arts_Entertainment", "Business", "Journalism", "Politics_Gov", "Religion", "Science", "Social_Issues", "Sports"])
+			    .range(["#f47a7f", "#ffd24b", "#ce4e58", "#006896", "#b6b6b6", "#9180d6", "#f7941e", "#91d9d2"]);
+
+	        pieChart(data, "Amount",60,80,svg,colors,100)
+	    })
+
+	        function pieChart(data,column,inner,outer,svg,colors,x){
+       
+	        var pie = d3.pie();
+	        var arc = d3.arc().innerRadius(inner).outerRadius(outer)
+
+	        var array = []
+			//console.log(data)
+	        for(var d in data){
+				if(data[d][column]!=undefined){
+	            	array.push(data[d][column])
+				}
+	        }
+	        //console.log(array)
+
+	        var arcs = svg.selectAll("g.arc")
+	                .data(pie(array))
+	                .enter()
+	                .append("g")
+	                .attr("class",column)
+	                .attr("transform", "translate(" + x + "," + h/2 + ")")
+	                .append("path")
+		        	.style("fill", function(d,i) {
+							       return colors(i);
+			                     })
+	                .attr("stroke","#ffffff")
+	                .attr("stroke-width",2)
+	                .attr("d", arc)
+					.style("opacity",0.8)
+					.on("click",function(d,i){
+						var currentOccupation = data[i]["Occupation"]
+						console.log(byOccupation[currentOccupation])
+						
+				d3.selectAll("circle").remove()
+						drawDots(byOccupation[currentOccupation],geo,centroids)
+					d3.selectAll("circle")
+					   //.transition()
+					  // .duration(800)
+					   //.ease(d3.easeCircleIn)
+					    .style('fill', function(d) {
+							       return colors(currentOccupation);
+			                     }) 
+					})
+                    .on("mouseover",function(d,i){
+				d3.select(this).style("opacity",1)
+				console.log(this)
+			
+
+		  	     d3.select("#tooltip2")
+				   .select("#Occupation")
+				     .style("left",600 + "px")
+			 	     .style("top",800 + "px")						 
+					 .html(data[i]["Occupation"]+"<br>"+d.data+"<br>"+Math.round(d.data/754*100)+"%");
+
+					 d3.select("#tooltip2").classed("hidden", false);
+			   
+                    })
+                    .on("mouseout",function(d,i){
+                        d3.select(this).style("opacity",0.8);
+ 					   d3.select("#tooltip2").classed("hidden", true);
+                    });
+					
+					
+					
+					
+					
+					
+					d3.select("#buttonTotal").style("cursor","pointer")
+					.on("click",function(){
+						d3.selectAll("circle")
+					   //.transition()
+					   //.duration(800)
+					  // .ease(d3.easeCircleIn)
+						.remove()
+						
+						drawDots(places,geo,centroids)
+						
+		
+	          
+			
+				})
+		
+				
+		
+              
+	        }
+			
+			
+			
+
+			
+			
+			
+			
+			
+</script>
+</body>
+</html>

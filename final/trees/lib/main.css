@@ -1,0 +1,32 @@
+.container{
+  width: 100%;  /* 원하는 값을 입력해주세요 */
+  margin: 0 auto;
+}
+.album{
+  width: 100%;  /* 원하는 값을 입력해주세요 */
+  height: 60%; /* 원하는 값을 입력해주세요 */
+  overflow: hidden;
+}
+.images{
+  position: relative;
+  display: flex;
+  height: 100%;  /* 원하는 값을 입력해주세요 */
+}
+img{
+  width: 100%;  /* 원하는 값을 입력해주세요 */
+  height: 60%; /* 원하는 값을 입력해주세요 */
+}
+button, button:active, button:focus{
+  width: 100px; /* 원하는 값을 입력해주세요 */
+  height: 85px; /* 원하는 값을 입력해주세요 */
+  background-color: lightgreen;  /* 원하는 색상을 입력해주세요 */
+}
+button:disabled{
+  background-color: white; /* 원하는 색상을 입력해주세요 */
+}
+.prev{
+  float: left;
+}
+.next{
+  float: right;
+}
