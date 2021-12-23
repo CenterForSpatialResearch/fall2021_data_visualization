@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <title>basic located</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    
+<script type="text/javascript"src="https://d3js.org/d3.v5.min.js"></script>
+  
+    <style>
+    </style>
+
+</head>
+
+<body>
+</div>
+		<script type="text/javascript"> 
+            var w = 1200
+            var h = 800
+        
+        d3.csv("krutspenser_LATE_42436_12475742_Wilderness-per-agency.csv")
+        .then(function(data){
+       
+            var svg = d3.select("body").append("svg").attr("width",w).attr("height",h)
+
+            var colors = ["gold", "blue", "green", "maroon"]
+    
+        pieChart(data, "Acres",100,200,svg,colors,200)
+    })
+
+        function pieChart(data,column,inner,outer,svg,colors,x){
+               
+        var pie = d3.pie();
+        var arc = d3.arc().innerRadius(inner).outerRadius(outer)
+      
+        var array = []
+        for(var d in data){
+            array.push(data[d][column])
+        }
+        
+        var arcs = svg.selectAll("g.arc")
+                .data(pie(array))
+                .enter()
+                .append("g")
+                .attr("class",column)
+                .attr("transform", "translate(" + x + "," + h/2 + ")")
+                .append("path")
+                .attr("fill", function(d, i) {
+                    return colors[i];
+                })
+                .attr("stroke","#ffffff")
+                .attr("stroke-width",2)
+                .attr("d", arc)
+                .on("mouseover", function() {
+			   		d3.select(this)
+			   			.attr("fill", "gray");
+			    })
+			    //hOW DO I RETURN TO THE ORIGINAL COLOR INSTEAD OF BLACK?
+                .on("mouseout", function(d) {
+				   d3.select(this)
+						.attr("fill", colors["gold", "blue", "green", "maroon"]);
+                })
+                
+                // HOW DO I USE THE "AGENCY" COLUMN FOR THE LABELS INSTEAD OF "ACRES"?
+                svg.selectAll(".labels")
+                .data(data)
+                .enter()
+                .append("text")
+			    .attr("class",column+"_label")
+                .text(function(d){
+                   return d[column]
+                })
+                // HOW DO I MOVE THE LABELS TO THEIR RESPECTIVE ARCS?
+                //.attr("x",function(d,i){
+                //     return ??
+                //  })
+                // .attr("y",function(d){
+                //      return ??
+                //})
+                .attr("font-family", "sans-serif")
+			    .attr("font-size", "11px")
+			    .attr("fill", "black");
+        }
+</script>
+</body>
+</html>

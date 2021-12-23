@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: Time axis, prettier</title>
+		<script type="text/javascript" src="../d3.js"></script>
+		<style type="text/css">
+		
+			#tooltip {
+				position: absolute;
+				width: 200px;
+				height: auto;
+				padding: 10px;
+				background-color: white;
+				-webkit-border-radius: 10px;
+				-moz-border-radius: 10px;
+				border-radius: 10px;
+				-webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+				-moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+				box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+				pointer-events: none;
+			}
+			
+			#tooltip.hidden {
+				display: none;
+			}
+			
+			#tooltip p {
+				margin: 0;
+				font-family: sans-serif;
+				font-size: 12px;
+				line-height: 20px;
+			}
+				
+		</style>
+	</head>
+	<body>
+		<div id="tooltip" class="hidden">
+			<p><strong></strong></p>
+			<p><span id="value">100</span>%</p>
+		</div>
+		<script type="text/javascript">
+
+		
+	            var w = 1200
+	            var h = 800
+    
+	        d3.csv("lishuhua_LATE_542114_12969914_Time Cover Data final.csv")
+	        .then(function(data){
+   
+	              var svg = d3.select("body").append("svg").attr("width",w).attr("height",h)
+
+	            var colors = ["#1D3557","#8ECAE6","#DC2F02","#81B29A","#FF4D6D","#9FA0FF","#FFB703","#6CBE45"]
+
+	        pieChart(data, "Amount",100,200,svg,colors,200)
+	    })
+
+	        function pieChart(data,column,inner,outer,svg,colors,x){
+           
+	        var pie = d3.pie();
+	        var arc = d3.arc().innerRadius(inner).outerRadius(outer)
+  
+	        var array = []
+			console.log(data)
+	        for(var d in data){
+				//STEP 1 I added this if statement to filter out column headings.
+				if(data[d][column]!=undefined){
+	            	array.push(data[d][column])
+				}
+	        }
+	console.log(array)
+
+	        var arcs = svg.selectAll("g.arc")
+	                .data(pie(array))
+	                .enter()
+	                .append("g")
+	                .attr("class",column)
+	                .attr("transform", "translate(" + x + "," + h/2 + ")")
+	                .append("path")
+	                .attr("fill", function(d, i) {
+	                    return colors[i];
+	                })
+	                .attr("stroke","#ffffff")
+	                .attr("stroke-width",2)
+	                .attr("d", arc)
+					.style("opacity",0.5)
+                    .on("mouseover",function(d,i){
+                        d3.select(this).style("opacity",1);
+						
+				                   console.log(data[i])
+						         
+				   console.log(d)
+    					var xPosition = parseFloat(d3.select(this).attr("cx")) ;
+    					var yPosition = parseFloat(d3.select(this).attr("cy")) + 20;
+
+    					//Update the tooltip position and value
+    					d3.select("#tooltip")
+    						.style("left", xPosition + "px")
+    						.style("top", yPosition + "px")						
+    						.select("#value")
+    						.html(data[i]["Occupation"]+"<br>"+d.data+"<br>"+Math.round(d.data/754*100)+"%");
+									   
+    					//Show the tooltip
+    					d3.select("#tooltip").classed("hidden", false);
+				   
+                        //TODO: show tooltip here
+                    })
+                    .on("mouseout",function(d,i){
+                        d3.select(this).style("opacity",0.7);
+ 					   d3.select("#tooltip").classed("hidden", true);
+                        //TODO: hide tooltip here
+                    });
+			
+	              
+	        }
+    </script>
+</body>
+</html>
